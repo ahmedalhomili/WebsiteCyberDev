@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberDev - أداة فحص نقاط ضعف مواقع الويب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ========== CSS VARIABLES ========== */
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --bg-card-hover: #1f2b42;
+            --accent-cyan: #00f0ff;
+            --accent-green: #00ff88;
+            --accent-purple: #a855f7;
+            --accent-red: #ff4757;
+            --accent-orange: #ff9f43;
+            --accent-blue: #3b82f6;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
+            --border-glow: rgba(0, 240, 255, 0.15);
+            --gradient-main: linear-gradient(135deg, #00f0ff, #00ff88);
+            --gradient-purple: linear-gradient(135deg, #a855f7, #6366f1);
+            --gradient-danger: linear-gradient(135deg, #ff4757, #ff6b81);
+            --shadow-cyan: 0 0 30px rgba(0, 240, 255, 0.1);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --font-main: 'Cairo', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========== RESET & BASE ========== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        a:hover {
+            color: var(--accent-green);
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        /* ========== ANIMATED BACKGROUND ========== */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .floating-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatOrb 20s ease-in-out infinite;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: var(--accent-cyan);
+            top: -100px; right: -100px;
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            background: var(--accent-purple);
+            bottom: -50px; left: -50px;
+            animation-delay: -10s;
+        }
+        .orb-3 {
+            width: 300px; height: 300px;
+            background: var(--accent-green);
+            top: 50%; left: 50%;
+            animation-delay: -5s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.1); }
+            50% { transform: translate(-30px, 50px) scale(0.9); }
+            75% { transform: translate(30px, 30px) scale(1.05); }
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .navbar.scrolled {
+            background: rgba(10, 14, 23, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+        .nav-logo .logo-icon {
+            width: 42px; height: 42px;
+            background: var(--gradient-main);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-primary);
+        }
+        .nav-logo span {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.06);
+        }
+
+        .nav-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--gradient-main);
+            color: var(--bg-primary) !important;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            -webkit-text-fill-color: var(--bg-primary);
+        }
+        .nav-github:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.3);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* ========== MOBILE MENU ========== */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 72px; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 14, 23, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            padding: 30px 24px;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+        .mobile-menu.open {
+            display: flex;
+        }
+        .mobile-menu a {
+            color: var(--text-secondary);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .mobile-menu a:hover,
+        .mobile-menu a.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.06);
+            border-color: var(--border-glow);
+        }
+
+        /* ========== SECTIONS ========== */
+        .section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 24px;
+        }
+        .section:nth-child(even) {
+            background: rgba(17, 24, 39, 0.5);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--accent-cyan);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .section-title .highlight {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin-bottom: 50px;
+            line-height: 2;
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            color: var(--accent-green);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .hero-tag .dot {
+            width: 8px; height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .hero-title .line {
+            display: block;
+        }
+        .hero-title .gradient-text {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-desc {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            line-height: 2;
+            margin-bottom: 36px;
+            max-width: 520px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--gradient-main);
+            color: var(--bg-primary);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 240, 255, 0.3);
+            color: var(--bg-primary);
+        }
+        .btn-secondary {
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(0, 240, 255, 0.15);
+            transform: translateY(-3px);
+            color: var(--accent-cyan);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Hero Terminal */
+        .hero-terminal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card), var(--shadow-cyan);
+            position: relative;
+        }
+        .terminal-header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+        .terminal-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #28c840; }
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+        }
+        .terminal-body {
+            padding: 24px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 2;
+            min-height: 350px;
+            direction: ltr;
+            text-align: left;
+        }
+        .terminal-line {
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: terminalFade 0.5s forwards;
+        }
+        .terminal-line:nth-child(1) { animation-delay: 0.3s; }
+        .terminal-line:nth-child(2) { animation-delay: 0.8s; }
+        .terminal-line:nth-child(3) { animation-delay: 1.3s; }
+        .terminal-line:nth-child(4) { animation-delay: 1.8s; }
+        .terminal-line:nth-child(5) { animation-delay: 2.3s; }
+        .terminal-line:nth-child(6) { animation-delay: 2.8s; }
+        .terminal-line:nth-child(7) { animation-delay: 3.3s; }
+        .terminal-line:nth-child(8) { animation-delay: 3.8s; }
+        .terminal-line:nth-child(9) { animation-delay: 4.3s; }
+        .terminal-line:nth-child(10) { animation-delay: 4.8s; }
+        .terminal-line:nth-child(11) { animation-delay: 5.3s; }
+        .terminal-line:nth-child(12) { animation-delay: 5.8s; }
+        .terminal-line:nth-child(13) { animation-delay: 6.3s; }
+
+        @keyframes terminalFade {
+            to { opacity: 1; }
+        }
+        .t-prompt { color: var(--accent-green); }
+        .t-cmd { color: var(--text-primary); }
+        .t-flag { color: var(--accent-purple); }
+        .t-url { color: var(--accent-cyan); }
+        .t-info { color: var(--accent-blue); }
+        .t-warn { color: var(--accent-orange); }
+        .t-success { color: var(--accent-green); }
+        .t-error { color: var(--accent-red); }
+        .t-dim { color: var(--text-muted); }
+        .t-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--accent-green);
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* ========== CARDS GRID ========== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-main);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: rgba(0, 240, 255, 0.2);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-cyan);
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+        .card-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        .card-icon.cyan { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); }
+        .card-icon.green { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
+        .card-icon.purple { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); }
+        .card-icon.orange { background: rgba(255, 159, 67, 0.1); color: var(--accent-orange); }
+        .card-icon.blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+        .card-icon.red { background: rgba(255, 71, 87, 0.1); color: var(--accent-red); }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.9;
+        }
+
+        /* ========== ABOUT SECTION ========== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .about-features {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .about-feature {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .about-feature-icon {
+            width: 48px; height: 48px;
+            min-width: 48px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
+        }
+        .about-feature h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .about-feature p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .philosophy-box {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(0, 255, 136, 0.05));
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 32px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .philosophy-box .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .philosophy-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        .philosophy-box p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== FEATURES SECTION ========== */
+        .features-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn:hover,
+        .tab-btn.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.08);
+        }
+
+        .scan-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .scan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: var(--transition);
+        }
+        .scan-card:hover {
+            border-color: rgba(0, 240, 255, 0.2);
+            background: var(--bg-card-hover);
+        }
+        .scan-icon {
+            width: 44px; height: 44px;
+            min-width: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .scan-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .scan-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        /* ========== DOCS SECTION ========== */
+        .docs-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+        .docs-sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: sticky;
+            top: 96px;
+            height: fit-content;
+        }
+        .docs-sidebar h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .docs-nav {
+            list-style: none;
+        }
+        .docs-nav li {
+            margin-bottom: 4px;
+        }
+        .docs-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .docs-nav a:hover,
+        .docs-nav a.active {
+            background: rgba(0, 240, 255, 0.06);
+            color: var(--accent-cyan);
+        }
+        .docs-content {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .doc-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+        .doc-block h3 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .doc-block h3 i {
+            color: var(--accent-cyan);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 2;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+        .code-block .copy-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--accent-cyan);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .code-block .copy-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+
+        .doc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .doc-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .doc-list li i {
+            color: var(--accent-green);
+            min-width: 20px;
+        }
+
+        /* ========== DOWNLOAD ========== */
+        .download-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .download-card.featured {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: var(--shadow-cyan);
+        }
+        .download-card.featured::before {
+            content: 'مُوصى به';
+            position: absolute;
+            top: -12px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-main);
+            color: var(--bg-primary);
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .download-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 240, 255, 0.2);
+        }
+        .download-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .download-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .download-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .hash-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-top: 40px;
+            direction: ltr;
+            text-align: left;
+        }
+        .hash-box h4 {
+            color: var(--accent-orange);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            direction: rtl;
+            text-align: right;
+        }
+        .hash-box code {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        /* ========== REPORTS ========== */
+        .report-demo {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .report-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .report-header h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        .report-formats {
+            display: flex;
+            gap: 8px;
+        }
+        .format-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+        .format-badge.json { background: rgba(255, 159, 67, 0.15); color: var(--accent-orange); }
+        .format-badge.html { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .format-badge.csv { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); }
+
+        .report-body {
+            padding: 28px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-table th {
+            text-align: right;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .report-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+            font-size: 0.9rem;
+        }
+        .severity {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .severity.critical { background: rgba(255, 71, 87, 0.15); color: var(--accent-red); }
+        .severity.high { background: rgba(255, 159, 67, 0.15); color: var(--accent-orange); }
+        .severity.medium { background: rgba(255, 191, 0, 0.15); color: #ffc107; }
+        .severity.low { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); }
+        .severity.info { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        .status-dot.vuln { background: var(--accent-red); }
+        .status-dot.safe { background: var(--accent-green); }
+
+        /* ========== CHANGELOG ========== */
+        .timeline {
+            position: relative;
+            padding-right: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+            padding-right: 40px;
+        }
+        .timeline-dot {
+            position: absolute;
+            right: -40px;
+            top: 6px;
+            width: 28px; height: 28px;
+            background: var(--bg-card);
+            border: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .timeline-dot.latest {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        .timeline-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            transition: var(--transition);
+        }
+        .timeline-card:hover {
+            border-color: rgba(0, 240, 255, 0.2);
+        }
+        .version-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .timeline-date {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+        .change-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .change-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .change-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 55px;
+            text-align: center;
+        }
+        .change-type.new { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); }
+        .change-type.fix { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .change-type.improve { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
+
+        /* ========== LEGAL ========== */
+        .legal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .legal-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+        }
+        .legal-card.warning {
+            border-color: rgba(255, 71, 87, 0.3);
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.05), transparent);
+        }
+        .legal-card.safe {
+            border-color: rgba(0, 255, 136, 0.3);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), transparent);
+        }
+        .legal-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+        .legal-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .legal-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        .legal-list li i {
+            min-width: 20px;
+            margin-top: 6px;
+        }
+
+        .legal-disclaimer {
+            background: rgba(255, 159, 67, 0.08);
+            border: 1px solid rgba(255, 159, 67, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .legal-disclaimer p {
+            color: var(--accent-orange);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* ========== CONTACT ========== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition);
+        }
+        .contact-card:hover {
+            border-color: rgba(0, 240, 255, 0.2);
+            transform: translateX(-4px);
+        }
+        .contact-card-icon {
+            width: 50px; height: 50px;
+            min-width: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .contact-card h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .contact-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .contact-form {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+        .contact-form h3 {
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ========== COMMUNITY ========== */
+        .community-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .contributor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .contributor-card:hover {
+            border-color: rgba(0, 240, 255, 0.2);
+            transform: translateY(-4px);
+        }
+        .contributor-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--bg-primary);
+            margin: 0 auto 16px;
+        }
+        .contributor-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        .contributor-card .role {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .contributor-card .links {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .contributor-card .links a {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: rgba(0, 240, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .contributor-card .links a:hover {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .contribute-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 50px;
+        }
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px;
+            text-align: center;
+            position: relative;
+        }
+        .step-number {
+            width: 40px; height: 40px;
+            background: var(--gradient-main);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin: 0 auto 16px;
+        }
+        .step-card h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 60px 24px 30px;
+        }
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-brand .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .footer-brand .logo span {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+        .footer-social {
+            display: flex;
+            gap: 10px;
+        }
+        .footer-social a {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(0, 240, 255, 0.06);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .footer-social a:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: translateY(-3px);
+        }
+        .footer-col h4 {
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        .footer-col ul {
+            list-style: none;
+        }
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        .footer-col ul a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .footer-col ul a:hover {
+            color: var(--accent-cyan);
+            padding-right: 6px;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ========== SCROLL TO TOP ========== */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 48px; height: 48px;
+            background: var(--gradient-main);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: var(--transition);
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.3);
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-top:hover {
+            transform: translateY(-4px);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-desc {
+                margin: 0 auto 36px;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+            .hero-stats {
+                justify-content: center;
+            }
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            .docs-layout {
+                grid-template-columns: 1fr;
+            }
+            .docs-sidebar {
+                position: static;
+            }
+            .legal-content {
+                grid-template-columns: 1fr;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .section {
+                padding: 70px 16px;
+            }
+            .hero {
+                padding-top: 80px;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-stats {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .scan-types-grid {
+                grid-template-columns: 1fr;
+            }
+            .download-cards {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+            .features-tabs {
+                gap: 6px;
+            }
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            .report-header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            .report-table {
+                font-size: 0.8rem;
+            }
+            .report-table th,
+            .report-table td {
+                padding: 10px 8px;
+            }
+            .contribute-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                justify-content: center;
+            }
+            .terminal-body {
+                font-size: 0.72rem;
+                padding: 16px;
+            }
+        }
+
+        /* ========== ANIMATIONS ON SCROLL ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger children */
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .stagger-children.visible > *:nth-child(1) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(2) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(3) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(4) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(5) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(6) { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(7) { transition-delay: 0.7s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(8) { transition-delay: 0.8s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(9) { transition-delay: 0.9s; opacity: 1; transform: translateY(0); }
+
+        /* ========== TOAST NOTIFICATION ========== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transform: translateX(200%);
+            transition: transform 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast i {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+        }
+        .toast span {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+                <span>CyberDev</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="active">الرئيسية</a></li>
+                <li><a href="#about">حول الأداة</a></li>
+                <li><a href="#features">المميزات</a></li>
+                <li><a href="#docs">التوثيق</a></li>
+                <li><a href="#download">التحميل</a></li>
+                <li><a href="#reports">التقارير</a></li>
+                <li><a href="#changelog">سجل التغييرات</a></li>
+                <li><a href="#legal">الاستخدام القانوني</a></li>
+                <li><a href="#contact">تواصل</a></li>
+                <li><a href="#community">المجتمع</a></li>
+            </ul>
+
+            <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank" class="nav-github">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+
+            <button class="mobile-toggle" id="mobileToggle" aria-label="فتح القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="#about"><i class="fas fa-info-circle"></i> حول الأداة</a>
+        <a href="#features"><i class="fas fa-star"></i> المميزات</a>
+        <a href="#docs"><i class="fas fa-book"></i> التوثيق</a>
+        <a href="#download"><i class="fas fa-download"></i> التحميل</a>
+        <a href="#reports"><i class="fas fa-chart-bar"></i> التقارير</a>
+        <a href="#changelog"><i class="fas fa-code-branch"></i> سجل التغييرات</a>
+        <a href="#legal"><i class="fas fa-gavel"></i> الاستخدام القانوني</a>
+        <a href="#contact"><i class="fas fa-envelope"></i> تواصل</a>
+        <a href="#community"><i class="fas fa-users"></i> المجتمع</a>
+        <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank">
+            <i class="fab fa-github"></i> GitHub
+        </a>
+    </div>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="section hero" id="home">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-tag">
+                        <span class="dot"></span>
+                        الإصدار v1.0.0 متوفر الآن
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="line">أداة فحص</span>
+                        <span class="line"><span class="gradient-text">نقاط ضعف</span></span>
+                        <span class="line">مواقع الويب</span>
+                    </h1>
+                    <p class="hero-desc">
+                        أداة احترافية لفحص نقاط ضعف مواقع الويب بشكل آمن وقانوني.
+                        مصممة لطلاب الأمن السيبراني والمختبرات التعليمية والشركات الصغيرة.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#download" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> ابدأ الفحص الآن
+                        </a>
+                        <a href="#docs" class="btn btn-secondary">
+                            <i class="fas fa-book-open"></i> شاهد التوثيق
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="scanCount">10+</div>
+                            <div class="stat-label">نوع فحص</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">صيغ تقارير</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">مفتوح المصدر</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">CLI</div>
+                            <div class="stat-label">واجهة تفاعلية</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <span class="terminal-dot red"></span>
+                            <span class="terminal-dot yellow"></span>
+                            <span class="terminal-dot green"></span>
+                        </div>
+                        <span class="terminal-title">CyberDev — Terminal</span>
+                    </div>
+                    <div class="terminal-body" id="terminalBody">
+                        <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">python cyberdev.py</span> <span class="t-flag">--target</span> <span class="t-url">https://example.com</span></div>
+                        <div class="terminal-line"><br></div>
+                        <div class="terminal-line"><span class="t-info">  ██████╗██╗   ██╗██████╗ ███████╗██████╗</span></div>
+                        <div class="terminal-line"><span class="t-info"> ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗</span></div>
+                        <div class="terminal-line"><span class="t-info"> ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝</span></div>
+                        <div class="terminal-line"><span class="t-info"> ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗</span></div>
+                        <div class="terminal-line"><span class="t-info"> ╚██████╗   ██║   ██████╔╝███████╗██║  ██║</span></div>
+                        <div class="terminal-line"><span class="t-info">  ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝</span></div>
+                        <div class="terminal-line"><br></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Starting scan on</span> <span class="t-url">https://example.com</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Checking Security Headers...</span> <span class="t-warn">⚠ Missing X-Frame-Options</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Checking Email Security...</span> <span class="t-success">✔ SPF record found</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Scan completed! Report saved to</span> <span class="t-url">reports/scan_2025.json</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="reveal">
+                    <span class="section-badge"><i class="fas fa-info-circle"></i> حول الأداة</span>
+                    <h2 class="section-title">
+                        ما هي أداة <span class="highlight">CyberDev</span>؟
+                    </h2>
+                    <p class="section-desc">
+                        CyberDev هي أداة فحص أمني مفتوحة المصدر مكتوبة بلغة Python،
+                        تهدف إلى مساعدة المختصين والطلاب في فحص مواقع الويب واكتشاف
+                        نقاط الضعف بطريقة آمنة وقانونية — دون أي استغلال.
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 2; margin-bottom: 24px;">
+                        تتميز الأداة بواجهة CLI تفاعلية سهلة الاستخدام، وإمكانية تصدير التقارير
+                        بعدة صيغ، بالإضافة إلى نظام جلسات لحفظ نتائج الفحوصات السابقة.
+                    </p>
+                </div>
+                <div class="about-features reveal stagger-children">
+                    <div class="about-feature">
+                        <div class="about-feature-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <h4>طلاب الأمن السيبراني</h4>
+                            <p>أداة تعليمية مثالية لفهم نقاط الضعف الشائعة وكيفية اكتشافها في بيئة آمنة.</p>
+                        </div>
+                    </div>
+                    <div class="about-feature">
+                        <div class="about-feature-icon"><i class="fas fa-flask"></i></div>
+                        <div>
+                            <h4>المختبرات التعليمية</h4>
+                            <p>مناسبة للاستخدام في معامل الجامعات ومراكز التدريب لتعليم اختبار الاختراق.</p>
+                        </div>
+                    </div>
+                    <div class="about-feature">
+                        <div class="about-feature-icon"><i class="fas fa-building"></i></div>
+                        <div>
+                            <h4>الشركات الصغيرة</h4>
+                            <p>فحص سريع لمواقع الشركات الصغيرة والمتوسطة لاكتشاف المشاكل الأمنية الأساسية.</p>
+                        </div>
+                    </div>
+                    <div class="about-feature">
+                        <div class="about-feature-icon"><i class="fas fa-code"></i></div>
+                        <div>
+                            <h4>المطورين</h4>
+                            <p>أداة سهلة الدمج في عمليات التطوير للتحقق من أمان المواقع قبل الإطلاق.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="philosophy-box reveal">
+                <div class="icon">🛡️</div>
+                <h3>فلسفة الأداة</h3>
+                <p>
+                    فحص نقاط الضعف فقط — لا استغلال. CyberDev مصممة لتكون أداة كشف واستطلاع أمني،
+                    تساعدك على تحديد المشاكل الأمنية المحتملة دون محاولة استغلالها أو إلحاق أي ضرر.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FEATURES SECTION ==================== -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-star"></i> المميزات</span>
+                <h2 class="section-title">مميزات <span class="highlight">قوية</span> لفحص شامل</h2>
+                <p class="section-desc" style="margin: 0 auto 40px;">
+                    تقدم CyberDev مجموعة متنوعة من الفحوصات الأمنية مع واجهة تفاعلية سهلة الاستخدام.
+                </p>
+            </div>
+
+            <div class="features-tabs reveal">
+                <button class="tab-btn active" onclick="showTab('scans')">أنواع الفحوصات</button>
+                <button class="tab-btn" onclick="showTab('cli')">واجهة CLI</button>
+                <button class="tab-btn" onclick="showTab('reports-feat')">التقارير</button>
+                <button class="tab-btn" onclick="showTab('sessions')">الجلسات</button>
+            </div>
+
+            <!-- Scans Tab -->
+            <div class="tab-content" id="tab-scans">
+                <div class="scan-types-grid reveal stagger-children">
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h4>Misconfigurations</h4>
+                            <p>اكتشاف الإعدادات الخاطئة في السيرفر والتطبيق التي قد تؤدي لثغرات أمنية.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h4>Outdated Software</h4>
+                            <p>الكشف عن البرمجيات والمكتبات القديمة التي تحتوي على ثغرات معروفة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fas fa-heading"></i>
+                        </div>
+                        <div>
+                            <h4>Security Headers</h4>
+                            <p>التحقق من وجود وتكوين هيدرز الأمان مثل CSP و X-Frame-Options وغيرها.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </div>
+                        <div>
+                            <h4>Email Security (SPF/DMARC)</h4>
+                            <p>فحص سجلات DNS للتحقق من حماية البريد الإلكتروني ضد الانتحال.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div>
+                            <h4>SSL/TLS Analysis</h4>
+                            <p>تحليل شهادات SSL وبروتوكولات التشفير المستخدمة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <h4>Server Information</h4>
+                            <p>جمع معلومات السيرفر مثل نوعه وإصداره والتقنيات المستخدمة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 191, 0, 0.1); color: #ffc107;">
+                            <i class="fas fa-cookie-bite"></i>
+                        </div>
+                        <div>
+                            <h4>Cookie Security</h4>
+                            <p>فحص إعدادات الكوكيز والتحقق من خصائص الأمان مثل HttpOnly و Secure.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h4>Robots.txt Analysis</h4>
+                            <p>تحليل ملف robots.txt للكشف عن مسارات حساسة قد تكون مكشوفة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div>
+                            <h4>Port Scanning</h4>
+                            <p>فحص المنافذ المفتوحة الشائعة على الخادم المستهدف.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLI Tab -->
+            <div class="tab-content" id="tab-cli" style="display: none;">
+                <div class="cards-grid reveal">
+                    <div class="card">
+                        <div class="card-icon cyan"><i class="fas fa-terminal"></i></div>
+                        <h3>واجهة تفاعلية كاملة</h3>
+                        <p>واجهة CLI تفاعلية مع قوائم ملونة وتنظيم واضح للخيارات باستخدام Rich و InquirerPy.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon green"><i class="fas fa-palette"></i></div>
+                        <h3>ألوان ورموز واضحة</h3>
+                        <p>نتائج ملونة بألوان مميزة لتسهيل التمييز بين النتائج الإيجابية والتحذيرات والأخطاء.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon purple"><i class="fas fa-sliders-h"></i></div>
+                        <h3>خيارات مرنة</h3>
+                        <p>إمكانية تخصيص الفحص واختيار أنواع محددة مع دعم الأوامر المتقدمة.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Feature Tab -->
+            <div class="tab-content" id="tab-reports-feat" style="display: none;">
+                <div class="cards-grid reveal">
+                    <div class="card">
+                        <div class="card-icon orange"><i class="fas fa-file-code"></i></div>
+                        <h3>تصدير JSON</h3>
+                        <p>تقارير بصيغة JSON مناسبة للمعالجة البرمجية والدمج مع أدوات أخرى.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon blue"><i class="fas fa-file-alt"></i></div>
+                        <h3>تصدير HTML</h3>
+                        <p>تقارير HTML جميلة وتفاعلية يمكن مشاركتها مع الفريق أو العميل.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon green"><i class="fas fa-file-csv"></i></div>
+                        <h3>تصدير CSV</h3>
+                        <p>تقارير CSV لتحليل البيانات في Excel أو أي أداة تحليل بيانات.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Tab -->
+            <div class="tab-content" id="tab-sessions" style="display: none;">
+                <div class="cards-grid reveal">
+                    <div class="card">
+                        <div class="card-icon cyan"><i class="fas fa-history"></i></div>
+                        <h3>حفظ الجلسات</h3>
+                        <p>حفظ نتائج كل فحص تلقائيًا لمراجعتها لاحقًا ومقارنتها بالفحوصات السابقة.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon purple"><i class="fas fa-search"></i></div>
+                        <h3>استعراض النتائج</h3>
+                        <p>إمكانية استعراض جميع الفحوصات السابقة مع تفاصيل كل فحص.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon green"><i class="fas fa-chart-line"></i></div>
+                        <h3>تتبع التغييرات</h3>
+                        <p>مقارنة النتائج عبر الزمن لمعرفة ما إذا تم إصلاح الثغرات.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DOCUMENTATION ==================== -->
+    <section class="section" id="docs">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-book"></i> التوثيق</span>
+                <h2 class="section-title">دليل الاستخدام <span class="highlight">الشامل</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    كل ما تحتاج لمعرفته لتثبيت واستخدام CyberDev بشكل فعال.
+                </p>
+            </div>
+
+            <div class="docs-layout">
+                <aside class="docs-sidebar reveal">
+                    <h3>📚 المحتويات</h3>
+                    <ul class="docs-nav">
+                        <li><a href="#doc-install" class="active"><i class="fas fa-download"></i> التثبيت</a></li>
+                        <li><a href="#doc-quickstart"><i class="fas fa-play"></i> البدء السريع</a></li>
+                        <li><a href="#doc-commands"><i class="fas fa-terminal"></i> أوامر CLI</a></li>
+                        <li><a href="#doc-config"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                        <li><a href="#doc-sessions"><i class="fas fa-history"></i> إدارة الجلسات</a></li>
+                        <li><a href="#doc-export"><i class="fas fa-file-export"></i> تصدير التقارير</a></li>
+                    </ul>
+                </aside>
+
+                <div class="docs-content">
+                    <!-- Installation -->
+                    <div class="doc-block reveal" id="doc-install">
+                        <h3><i class="fas fa-download"></i> التثبيت</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                            تأكد من توفر Python 3.8+ على جهازك قبل البدء.
+                        </p>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># استنساخ المشروع</span>
+<span class="t-prompt">$</span> git clone https://github.com/ahmedalhomili/CyberDev.git
+<span class="t-prompt">$</span> cd CyberDev
+
+<span class="t-dim"># إنشاء بيئة افتراضية (اختياري لكن مُوصى)</span>
+<span class="t-prompt">$</span> python -m venv venv
+<span class="t-prompt">$</span> source venv/bin/activate  <span class="t-dim"># Linux/Mac</span>
+<span class="t-prompt">$</span> venv\Scripts\activate     <span class="t-dim"># Windows</span>
+
+<span class="t-dim"># تثبيت المتطلبات</span>
+<span class="t-prompt">$</span> pip install -r requirements.txt
+                        </div>
+                        <h4 style="margin-top: 20px; margin-bottom: 12px;">المتطلبات:</h4>
+                        <ul class="doc-list">
+                            <li><i class="fas fa-check-circle"></i> Python 3.8 أو أحدث</li>
+                            <li><i class="fas fa-check-circle"></i> pip (مدير حزم Python)</li>
+                            <li><i class="fas fa-check-circle"></i> اتصال إنترنت للفحص</li>
+                        </ul>
+                    </div>
+
+                    <!-- Quick Start -->
+                    <div class="doc-block reveal" id="doc-quickstart">
+                        <h3><i class="fas fa-play"></i> البدء السريع</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                            ابدأ أول فحص لك في أقل من دقيقة:
+                        </p>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># تشغيل الأداة</span>
+<span class="t-prompt">$</span> python cyberdev.py
+
+<span class="t-dim"># أو مع تحديد الهدف مباشرة</span>
+<span class="t-prompt">$</span> python cyberdev.py --target https://example.com
+
+<span class="t-dim"># فحص محدد</span>
+<span class="t-prompt">$</span> python cyberdev.py --target https://example.com --scan headers
+                        </div>
+                    </div>
+
+                    <!-- CLI Commands -->
+                    <div class="doc-block reveal" id="doc-commands">
+                        <h3><i class="fas fa-terminal"></i> أوامر CLI</h3>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># عرض المساعدة</span>
+<span class="t-prompt">$</span> python cyberdev.py --help
+
+<span class="t-dim"># الأوامر المتاحة:</span>
+  --target, -t    <span class="t-dim">تحديد الموقع المستهدف</span>
+  --scan, -s      <span class="t-dim">نوع الفحص (headers, email, ssl, all)</span>
+  --output, -o    <span class="t-dim">مسار حفظ التقرير</span>
+  --format, -f    <span class="t-dim">صيغة التقرير (json, html, csv)</span>
+  --session       <span class="t-dim">استعراض الجلسات السابقة</span>
+  --verbose, -v   <span class="t-dim">عرض تفاصيل إضافية</span>
+  --version       <span class="t-dim">عرض رقم الإصدار</span>
+                        </div>
+                    </div>
+
+                    <!-- Config -->
+                    <div class="doc-block reveal" id="doc-config">
+                        <h3><i class="fas fa-cog"></i> الإعدادات</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                            يمكنك تخصيص إعدادات الأداة عبر ملف <code style="color: var(--accent-cyan);">config.py</code>:
+                        </p>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># config.py</span>
+<span class="t-flag">TIMEOUT</span> = <span class="t-url">30</span>          <span class="t-dim"># مهلة الاتصال بالثواني</span>
+<span class="t-flag">USER_AGENT</span> = <span class="t-url">"CyberDev/1.0"</span>
+<span class="t-flag">MAX_RETRIES</span> = <span class="t-url">3</span>       <span class="t-dim"># عدد المحاولات</span>
+<span class="t-flag">REPORT_DIR</span> = <span class="t-url">"reports/"</span> <span class="t-dim"># مجلد التقارير</span>
+<span class="t-flag">SESSION_DIR</span> = <span class="t-url">"sessions/"</span>
+                        </div>
+                    </div>
+
+                    <!-- Sessions -->
+                    <div class="doc-block reveal" id="doc-sessions">
+                        <h3><i class="fas fa-history"></i> إدارة الجلسات</h3>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># عرض جميع الجلسات المحفوظة</span>
+<span class="t-prompt">$</span> python cyberdev.py --session list
+
+<span class="t-dim"># عرض تفاصيل جلسة محددة</span>
+<span class="t-prompt">$</span> python cyberdev.py --session view --id 1
+
+<span class="t-dim"># حذف جلسة</span>
+<span class="t-prompt">$</span> python cyberdev.py --session delete --id 1
+                        </div>
+                    </div>
+
+                    <!-- Export -->
+                    <div class="doc-block reveal" id="doc-export">
+                        <h3><i class="fas fa-file-export"></i> تصدير التقارير</h3>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># تصدير بصيغة JSON</span>
+<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f json
+
+<span class="t-dim"># تصدير بصيغة HTML</span>
+<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f html
+
+<span class="t-dim"># تصدير بصيغة CSV</span>
+<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f csv
+
+<span class="t-dim"># تحديد مسار مخصص</span>
+<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f json -o ~/my-reports/
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DOWNLOAD ==================== -->
+    <section class="section" id="download">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-download"></i> التحميل</span>
+                <h2 class="section-title">حمّل <span class="highlight">CyberDev</span> الآن</h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    اختر الطريقة المناسبة لك لتحميل الأداة والبدء بالعمل.
+                </p>
+            </div>
+
+            <div class="download-cards reveal stagger-children">
+                <div class="download-card featured">
+                    <div class="icon" style="color: var(--accent-cyan);">
+                        <i class="fab fa-git-alt"></i>
+                    </div>
+                    <h3>Git Clone</h3>
+                    <p>الطريقة الأفضل — استنساخ المشروع مباشرة مع إمكانية التحديث بسهولة.</p>
+                    <div class="code-block" style="text-align: left; direction: ltr; margin: 16px 0;">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+                        git clone https://github.com/ahmedalhomili/CyberDev.git
+                    </div>
+                    <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fab fa-github"></i> فتح GitHub
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="icon" style="color: var(--accent-green);">
+                        <i class="fas fa-file-archive"></i>
+                    </div>
+                    <h3>تحميل ZIP</h3>
+                    <p>حمّل الملفات كملف مضغوط واستخرجها على جهازك.</p>
+                    <a href="https://github.com/ahmedalhomili/CyberDev/archive/refs/heads/main.zip" class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 20px;">
+                        <i class="fas fa-download"></i> تحميل ZIP
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="icon" style="color: var(--accent-purple);">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <h3>GitHub Releases</h3>
+                    <p>تحميل إصدار محدد ومستقر من صفحة الإصدارات الرسمية.</p>
+                    <a href="https://github.com/ahmedalhomili/CyberDev/releases" target="_blank" class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 20px;">
+                        <i class="fas fa-external-link-alt"></i> عرض الإصدارات
+                    </a>
+                </div>
+            </div>
+
+            <div class="hash-box reveal">
+                <h4><i class="fas fa-fingerprint"></i> التحقق من سلامة الملف (SHA256)</h4>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px; direction: rtl; text-align: right;">
+                    تحقق من تطابق الهاش بعد التحميل:
+                </p>
+                <div class="code-block" style="margin: 0;">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+<span class="t-dim"># Linux / Mac</span>
+sha256sum CyberDev-main.zip
+
+<span class="t-dim"># Windows (PowerShell)</span>
+Get-FileHash CyberDev-main.zip -Algorithm SHA256
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== REPORTS ==================== -->
+    <section class="section" id="reports">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-chart-bar"></i> التقارير</span>
+                <h2 class="section-title">نتائج فحص <span class="highlight">احترافية</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    تقارير واضحة ومنظمة تساعدك على فهم نقاط الضعف واتخاذ الإجراءات المناسبة.
+                </p>
+            </div>
+
+            <div class="report-demo reveal">
+                <div class="report-header">
+                    <h4><i class="fas fa-file-alt" style="color: var(--accent-cyan);"></i> مثال على تقرير فحص</h4>
+                    <div class="report-formats">
+                        <span class="format-badge json">JSON</span>
+                        <span class="format-badge html">HTML</span>
+                        <span class="format-badge csv">CSV</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    <div style="overflow-x: auto;">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>الفحص</th>
+                                    <th>النتيجة</th>
+                                    <th>الخطورة</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fas fa-heading" style="color: var(--accent-cyan); margin-left: 8px;"></i> X-Frame-Options</td>
+                                    <td>غير موجود — الموقع عرضة لـ Clickjacking</td>
+                                    <td><span class="severity high">عالي</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-heading" style="color: var(--accent-cyan); margin-left: 8px;"></i> Content-Security-Policy</td>
+                                    <td>غير مُعرّف — لا حماية ضد XSS</td>
+                                    <td><span class="severity critical">حرج</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-heading" style="color: var(--accent-cyan); margin-left: 8px;"></i> Strict-Transport-Security</td>
+                                    <td>HSTS مفعّل بشكل صحيح</td>
+                                    <td><span class="severity info">معلومة</span></td>
+                                    <td><span class="status-dot safe"></span> آمن</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-envelope" style="color: var(--accent-green); margin-left: 8px;"></i> SPF Record</td>
+                                    <td>سجل SPF موجود ومُعرّف بشكل صحيح</td>
+                                    <td><span class="severity info">معلومة</span></td>
+                                    <td><span class="status-dot safe"></span> آمن</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-envelope" style="color: var(--accent-green); margin-left: 8px;"></i> DMARC Record</td>
+                                    <td>غير مُعرّف — البريد عرضة للانتحال</td>
+                                    <td><span class="severity medium">متوسط</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-lock" style="color: var(--accent-purple); margin-left: 8px;"></i> SSL Certificate</td>
+                                    <td>الشهادة صالحة — تنتهي بعد 89 يومًا</td>
+                                    <td><span class="severity low">منخفض</span></td>
+                                    <td><span class="status-dot safe"></span> آمن</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-cookie" style="color: #ffc107; margin-left: 8px;"></i> Cookie Security</td>
+                                    <td>بعض الكوكيز بدون خاصية HttpOnly</td>
+                                    <td><span class="severity medium">متوسط</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CHANGELOG ==================== -->
+    <section class="section" id="changelog">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-code-branch"></i> سجل التغييرات</span>
+                <h2 class="section-title">تطور <span class="highlight">CyberDev</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    تتبع جميع التحديثات والتحسينات والإصلاحات لكل إصدار.
+                </p>
+            </div>
+
+            <div class="timeline reveal">
+                <div class="timeline-item">
+                    <div class="timeline-dot latest"></div>
+                    <div class="timeline-card">
+                        <span class="version-tag"><i class="fas fa-tag"></i> v1.2.0</span>
+                        <div class="timeline-date">📅 يناير 2025</div>
+                        <ul class="change-list">
+                            <li><span class="change-type new">جديد</span> إضافة فحص Cookie Security</li>
+                            <li><span class="change-type new">جديد</span> دعم تصدير تقارير CSV</li>
+                            <li><span class="change-type improve">تحسين</span> تحسين سرعة الفحوصات بنسبة 40%</li>
+                            <li><span class="change-type fix">إصلاح</span> إصلاح مشكلة في فحص SSL للنطاقات الفرعية</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <span class="version-tag"><i class="fas fa-tag"></i> v1.1.0</span>
+                        <div class="timeline-date">📅 ديسمبر 2024</div>
+                        <ul class="change-list">
+                            <li><span class="change-type new">جديد</span> إضافة نظام الجلسات</li>
+                            <li><span class="change-type new">جديد</span> دعم تقارير HTML</li>
+                            <li><span class="change-type improve">تحسين</span> تحسين واجهة CLI التفاعلية</li>
+                            <li><span class="change-type fix">إصلاح</span> إصلاح خطأ في فحص Email Security</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <span class="version-tag"><i class="fas fa-tag"></i> v1.0.0</span>
+                        <div class="timeline-date">📅 نوفمبر 2024</div>
+                        <ul class="change-list">
+                            <li><span class="change-type new">جديد</span> الإصدار الأول من CyberDev</li>
+                            <li><span class="change-type new">جديد</span> فحص Security Headers</li>
+                            <li><span class="change-type new">جديد</span> فحص Email Security (SPF/DMARC)</li>
+                            <li><span class="change-type new">جديد</span> فحص SSL/TLS</li>
+                            <li><span class="change-type new">جديد</span> تصدير تقارير JSON</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LEGAL ==================== -->
+    <section class="section" id="legal">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-gavel"></i> الاستخدام القانوني</span>
+                <h2 class="section-title">إخلاء المسؤولية <span class="highlight">والاستخدام الأخلاقي</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    CyberDev أداة تعليمية — استخدمها بمسؤولية وبشكل قانوني فقط.
+                </p>
+            </div>
+
+            <div class="legal-content reveal">
+                <div class="legal-card safe">
+                    <h3><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> الاستخدام المسموح</h3>
+                    <ul class="legal-list">
+                        <li>
+                            <i class="fas fa-check" style="color: var(--accent-green);"></i>
+                            فحص المواقع التي تملكها أو لديك إذن كتابي لفحصها
+                        </li>
+                        <li>
+                            <i class="fas fa-check" style="color: var(--accent-green);"></i>
+                            استخدام الأداة في بيئات تعليمية ومختبرات تدريب
+                        </li>
+                        <li>
+                            <i class="fas fa-check" style="color: var(--accent-green);"></i>
+                            فحص بيئات الاختبار المحلية (localhost)
+                        </li>
+                        <li>
+                            <i class="fas fa-check" style="color: var(--accent-green);"></i>
+                            المساهمة في تطوير الأداة وتحسينها
+                        </li>
+                        <li>
+                            <i class="fas fa-check" style="color: var(--accent-green);"></i>
+                            استخدامها ضمن برامج Bug Bounty المصرح بها
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="legal-card warning">
+                    <h3><i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i> الاستخدام المحظور</h3>
+                    <ul class="legal-list">
+                        <li>
+                            <i class="fas fa-times" style="color: var(--accent-red);"></i>
+                            فحص مواقع بدون إذن صريح من مالكها
+                        </li>
+                        <li>
+                            <i class="fas fa-times" style="color: var(--accent-red);"></i>
+                            استخدام النتائج لأغراض خبيثة أو ضارة
+                        </li>
+                        <li>
+                            <i class="fas fa-times" style="color: var(--accent-red);"></i>
+                            محاولة استغلال الثغرات المكتشفة
+                        </li>
+                        <li>
+                            <i class="fas fa-times" style="color: var(--accent-red);"></i>
+                            استخدامها في أنشطة غير قانونية بأي شكل
+                        </li>
+                        <li>
+                            <i class="fas fa-times" style="color: var(--accent-red);"></i>
+                            بيع أو مشاركة نتائج الفحص لأطراف غير مصرح لها
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="legal-disclaimer reveal">
+                <p>
+                    <i class="fas fa-exclamation-circle"></i>
+                    تحذير: المطور غير مسؤول عن أي استخدام غير قانوني أو غير أخلاقي لهذه الأداة.
+                    المستخدم يتحمل كامل المسؤولية عن كيفية استخدام الأداة والامتثال للقوانين المحلية والدولية.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CONTACT ==================== -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-envelope"></i> تواصل معنا</span>
+                <h2 class="section-title">تواصل & <span class="highlight">ساهم</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    لديك سؤال أو اقتراح؟ نحب أن نسمع منك. يمكنك أيضًا المساهمة في تطوير المشروع.
+                </p>
+            </div>
+
+            <div class="contact-grid reveal">
+                <div class="contact-info stagger-children">
+                    <div class="contact-card">
+                        <div class="contact-card-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div>
+                            <h4>GitHub Issues</h4>
+                            <p>أبلغ عن مشاكل أو اقترح ميزات جديدة</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/ahmedalhomili/CyberDev/issues" target="_blank" class="contact-card" style="cursor: pointer;">
+                        <div class="contact-card-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div>
+                            <h4>الإبلاغ عن خطأ</h4>
+                            <p>وجدت مشكلة؟ أبلغ عنها في Issues</p>
+                        </div>
+                    </a>
+                    <a href="https://github.com/ahmedalhomili/CyberDev/discussions" target="_blank" class="contact-card" style="cursor: pointer;">
+                        <div class="contact-card-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <h4>GitHub Discussions</h4>
+                            <p>انضم للنقاشات وشارك أفكارك</p>
+                        </div>
+                    </a>
+                    <div class="contact-card">
+                        <div class="contact-card-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <div>
+                            <h4>المساهمة</h4>
+                            <p>Fork → Branch → Commit → Pull Request</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h3><i class="fas fa-paper-plane" style="color: var(--accent-cyan); margin-left: 8px;"></i> أرسل رسالة</h3>
+                    <form id="contactForm" onsubmit="handleSubmit(event)">
+                        <div class="form-group">
+                            <label for="name">الاسم</label>
+                            <input type="text" id="name" placeholder="اكتب اسمك هنا..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني</label>
+                            <input type="email" id="email" placeholder="example@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">الموضوع</label>
+                            <input type="text" id="subject" placeholder="موضوع الرسالة..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">الرسالة</label>
+                            <textarea id="message" placeholder="اكتب رسالتك هنا..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i> إرسال الرسالة
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== COMMUNITY ==================== -->
+    <section class="section" id="community">
+        <div class="container">
+            <div class="reveal" style="text-align: center;">
+                <span class="section-badge"><i class="fas fa-users"></i> المجتمع</span>
+                <h2 class="section-title">مجتمع <span class="highlight">CyberDev</span></h2>
+                <p class="section-desc" style="margin: 0 auto 50px;">
+                    انضم إلى مجتمع المطورين والباحثين الأمنيين وساهم في تطوير الأداة.
+                </p>
+            </div>
+
+            <div class="community-grid reveal stagger-children">
+                <div class="contributor-card">
+                    <div class="contributor-avatar">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <h4>Ahmed Alhomili</h4>
+                    <span class="role">المؤسس والمطور الرئيسي</span>
+                    <div class="links">
+                        <a href="https://github.com/ahmedalhomili" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="contributor-card">
+                    <div class="contributor-avatar" style="background: var(--gradient-purple);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4>أنت!</h4>
+                    <span class="role">المساهم القادم</span>
+                    <div class="links">
+                        <a href="https://github.com/ahmedalhomili/CyberDev/fork" target="_blank"><i class="fas fa-code-branch"></i></a>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">
+                        ساهم في المشروع وانضم لقائمة المساهمين!
+                    </p>
+                </div>
+
+                <div class="contributor-card">
+                    <div class="contributor-avatar" style="background: var(--gradient-danger);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4>المجتمع العربي</h4>
+                    <span class="role">مجتمع الأمن السيبراني</span>
+                    <div class="links">
+                        <a href="https://github.com/ahmedalhomili/CyberDev/discussions" target="_blank"><i class="fas fa-comments"></i></a>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">
+                        انضم للنقاشات وشارك خبراتك
+                    </p>
+                </div>
+            </div>
+
+            <div class="reveal">
+                <h3 style="text-align: center; margin-top: 60px; margin-bottom: 12px; font-size: 1.4rem;">
+                    كيف تساهم في <span style="color: var(--accent-cyan);">CyberDev</span>؟
+                </h3>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">
+                    المشروع مفتوح المصدر ونرحب بجميع المساهمات!
+                </p>
+            </div>
+
+            <div class="contribute-steps reveal stagger-children">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Fork المشروع</h4>
+                    <p>انسخ المشروع إلى حسابك على GitHub بالضغط على زر Fork.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>أنشئ فرع جديد</h4>
+                    <p>أنشئ فرع باسم الميزة أو الإصلاح الذي تعمل عليه.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>طبّق التغييرات</h4>
+                    <p>أضف الكود أو الميزة الجديدة واختبرها جيدًا.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Pull Request</h4>
+                    <p>أرسل طلب دمج وسنراجعه ونضيفه للمشروع.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon" style="width: 36px; height: 36px; background: var(--gradient-main); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); font-size: 1rem;">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <span>CyberDev</span>
+                </div>
+                <p>أداة فحص نقاط ضعف مواقع الويب بشكل آمن واحترافي. مفتوحة المصدر ومصممة للتعلم والاستخدام الأخلاقي.</p>
+                <div class="footer-social">
+                    <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>التنقل</h4>
+                <ul>
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#about">حول الأداة</a></li>
+                    <li><a href="#features">المميزات</a></li>
+                    <li><a href="#docs">التوثيق</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>المصادر</h4>
+                <ul>
+                    <li><a href="#download">التحميل</a></li>
+                    <li><a href="#reports">التقارير</a></li>
+                    <li><a href="#changelog">سجل التغييرات</a></li>
+                    <li><a href="#legal">الاستخدام القانوني</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>المجتمع</h4>
+                <ul>
+                    <li><a href="#contact">تواصل</a></li>
+                    <li><a href="#community">المساهمون</a></li>
+                    <li><a href="https://github.com/ahmedalhomili/CyberDev/issues" target="_blank">Issues</a></li>
+                    <li><a href="https://github.com/ahmedalhomili/CyberDev/discussions" target="_blank">نقاشات</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 CyberDev — جميع الحقوق محفوظة. صُنع بـ ❤️ بواسطة <a href="https://github.com/ahmedalhomili" target="_blank">Ahmed Alhomili</a></p>
+            <p>
+                <a href="#legal" style="margin-left: 16px;">إخلاء المسؤولية</a>
+                <a href="https://github.com/ahmedalhomili/CyberDev/blob/main/LICENSE" target="_blank">الرخصة</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scroll To Top -->
+    <button class="scroll-top" id="scrollTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">تم النسخ بنجاح!</span>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ====== NAVBAR SCROLL EFFECT ======
+        const navbar = document.getElementById('navbar');
+        const scrollTop = document.getElementById('scrollTop');
+        const navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
+        const sections = document.querySelectorAll('.section');
+
+        window.addEventListener('scroll', () => {
+            // Navbar background
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Scroll to top button
+            if (window.scrollY > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+
+            // Active nav link
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        scrollTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ====== MOBILE MENU ======
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+            const icon = mobileToggle.querySelector('i');
+            if (mobileMenu.classList.contains('open')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                mobileToggle.querySelector('i').className = 'fas fa-bars';
+            });
+        });
+
+        // ====== TABS ======
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const targetTab = document.getElementById('tab-' + tabName);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+            }
+
+            event.target.classList.add('active');
+        }
+
+        // ====== COPY CODE ======
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement;
+            const text = codeBlock.textContent
+                .replace('نسخ', '')
+                .trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('تم نسخ الكود بنجاح! 📋');
+                btn.innerHTML = '<i class="fas fa-check"></i> تم!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+                }, 2000);
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('تم نسخ الكود بنجاح! 📋');
+            });
+        }
+
+        // ====== TOAST ======
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ====== CONTACT FORM ======
+        function handleSubmit(e) {
+            e.preventDefault();
+            showToast('تم إرسال رسالتك بنجاح! سنرد عليك قريبًا 💌');
+            e.target.reset();
+        }
+
+        // ====== SCROLL REVEAL ======
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ====== ANIMATED COUNTER ======
+        function animateCounter(element, target, duration) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target + '+';
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start) + '+';
+                }
+            }, 16);
+        }
+
+        // Observe scan count for animation
+        const scanCountEl = document.getElementById('scanCount');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(scanCountEl, 10, 1500);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        counterObserver.observe(scanCountEl);
+
+        // ====== SMOOTH SCROLL FOR DOCS SIDEBAR ======
+        document.querySelectorAll('.docs-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                document.querySelectorAll('.docs-nav a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ====== TERMINAL RE-ANIMATION ======
+        // Re-trigger terminal animation when hero is in view
+        const terminalBody = document.getElementById('terminalBody');
+        const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const lines = terminalBody.querySelectorAll('.terminal-line');
+                    lines.forEach(line => {
+                        line.style.animation = 'none';
+                        line.offsetHeight; // Trigger reflow
+                        line.style.animation = '';
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        heroObserver.observe(document.getElementById('home'));
+
+        // ====== KEYBOARD SHORTCUTS ======
+        document.addEventListener('keydown', (e) => {
+            // Press '/' to scroll to docs
+            if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+                const activeElement = document.activeElement;
+                if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    document.getElementById('docs').scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            // Press Escape to close mobile menu
+            if (e.key === 'Escape') {
+                mobileMenu.classList.remove('open');
+                mobileToggle.querySelector('i').className = 'fas fa-bars';
+            }
+        });
+    </script>
+</body>
+</html>
