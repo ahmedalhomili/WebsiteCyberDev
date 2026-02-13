@@ -1453,37 +1453,72 @@ img {
     .legal-content {
         grid-template-columns: 1fr;
     }
+
+/* للشاشات المتوسطة (التابلت) */
+@media (max-width: 992px) {
+    .hero-grid,
+    .about-grid,
+    .docs-layout,
+    .legal-content,
     .contact-grid {
         grid-template-columns: 1fr;
+        gap: 40px;
     }
+
     .footer-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    .docs-sidebar {
+        position: relative;
+        top: 0;
+        margin-bottom: 20px;
+    }
 }
 
+/* للشاشات الصغيرة (الهواتف المحمولة) */
 @media (max-width: 768px) {
-    .nav-links {
+    .nav-links,
+    .nav-github {
         display: none;
     }
     .nav-github {
         display: none;
     }
+
     .mobile-toggle {
         display: block;
     }
+
     .section {
-        padding: 70px 16px;
+        padding: 60px 16px;
     }
+
     .hero {
-        padding-top: 80px;
+        padding-top: 100px;
+        min-height: auto;
+        padding-bottom: 60px;
     }
+
     .hero-title {
         font-size: 2rem;
     }
+
     .hero-stats {
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 20px;
     }
+
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .cards-grid {
         grid-template-columns: 1fr;
     }
@@ -1493,13 +1528,21 @@ img {
     .download-cards {
         grid-template-columns: 1fr;
     }
+
     .footer-grid {
         grid-template-columns: 1fr;
+        text-align: center;
     }
+
     .footer-bottom {
         flex-direction: column;
         text-align: center;
     }
+
+    .footer-social {
+        justify-content: center;
+    }
+
     .features-tabs {
         gap: 6px;
     }
@@ -1522,19 +1565,10 @@ img {
     .contribute-steps {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 480px) {
-    .hero-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .btn {
-        justify-content: center;
-    }
     .terminal-body {
-        font-size: 0.72rem;
-        padding: 16px;
+        min-height: 250px;
+        font-size: 0.75rem;
     }
 }
 
