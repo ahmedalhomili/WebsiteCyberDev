@@ -717,7 +717,6 @@ img {
     top: 96px;
     height: fit-content;
     min-width: 0;
-    overflow: hidden;
 }
 .docs-sidebar h3 {
     font-size: 0.85rem;
@@ -1446,7 +1445,7 @@ img {
         grid-template-columns: 1fr;
     }
     .docs-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
     .docs-sidebar {
         position: static;
