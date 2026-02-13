@@ -37,6 +37,7 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
+    overflow-x: hidden;
 }
 
 body {
@@ -516,7 +517,7 @@ img {
 /* ========== CARDS GRID ========== */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: 24px;
 }
 .card {
@@ -715,6 +716,8 @@ img {
     position: sticky;
     top: 96px;
     height: fit-content;
+    min-width: 0;
+    overflow: hidden;
 }
 .docs-sidebar h3 {
     font-size: 0.85rem;
@@ -822,7 +825,7 @@ img {
 /* ========== DOWNLOAD ========== */
 .download-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 24px;
 }
 .download-card {
@@ -1461,6 +1464,9 @@ img {
 
 @media (max-width: 768px) {
     .nav-links {
+        display: none;
+    }
+    .nav-github {
         display: none;
     }
     .mobile-toggle {
