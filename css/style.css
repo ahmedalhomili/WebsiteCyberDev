@@ -37,6 +37,7 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
+    overflow-x: hidden;
 }
 
 body {
@@ -516,7 +517,7 @@ img {
 /* ========== CARDS GRID ========== */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: 24px;
 }
 .card {
@@ -715,6 +716,7 @@ img {
     position: sticky;
     top: 96px;
     height: fit-content;
+    min-width: 0;
 }
 .docs-sidebar h3 {
     font-size: 0.85rem;
@@ -822,7 +824,7 @@ img {
 /* ========== DOWNLOAD ========== */
 .download-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 24px;
 }
 .download-card {
@@ -1425,6 +1427,32 @@ img {
 }
 
 /* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .hero-desc {
+        margin: 0 auto 36px;
+    }
+    .hero-buttons {
+        justify-content: center;
+    }
+    .hero-stats {
+        justify-content: center;
+    }
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+    .docs-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .docs-sidebar {
+        position: static;
+    }
+    .legal-content {
+        grid-template-columns: 1fr;
+    }
 
 /* للشاشات المتوسطة (التابلت) */
 @media (max-width: 992px) {
@@ -1451,6 +1479,9 @@ img {
 /* للشاشات الصغيرة (الهواتف المحمولة) */
 @media (max-width: 768px) {
     .nav-links,
+    .nav-github {
+        display: none;
+    }
     .nav-github {
         display: none;
     }
