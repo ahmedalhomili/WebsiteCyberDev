@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberDev - أداة فحص نقاط ضعف مواقع الويب</title>
+    <title>CyberDev - أداة فحص نقاط الضعف الأمنية لمواقع الويب | 25 خطوة فحص | 18+ نقطة ضعف</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=7.5">
 </head>
 <body>
 
@@ -32,10 +32,11 @@
                 <li><a href="#docs">التوثيق</a></li>
                 <li><a href="#download">التحميل</a></li>
                 <li><a href="#reports">التقارير</a></li>
+               
                 <li><a href="#changelog">سجل التغييرات</a></li>
                 <li><a href="#legal">الاستخدام القانوني</a></li>
                 <li><a href="#contact">تواصل</a></li>
-                <li><a href="#community">المجتمع</a></li>
+                <li><a href="#community">الفريق</a></li>
             </ul>
 
             <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank" class="nav-github">
@@ -56,14 +57,21 @@
         <a href="#docs"><i class="fas fa-book"></i> التوثيق</a>
         <a href="#download"><i class="fas fa-download"></i> التحميل</a>
         <a href="#reports"><i class="fas fa-chart-bar"></i> التقارير</a>
+       
         <a href="#changelog"><i class="fas fa-code-branch"></i> سجل التغييرات</a>
         <a href="#legal"><i class="fas fa-gavel"></i> الاستخدام القانوني</a>
         <a href="#contact"><i class="fas fa-envelope"></i> تواصل</a>
-        <a href="#community"><i class="fas fa-users"></i> المجتمع</a>
+        <a href="#community"><i class="fas fa-users"></i> الفريق</a>
         <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank">
             <i class="fab fa-github"></i> GitHub
         </a>
     </div>
+
+
+    <!-- Sidebar Toggle Button -->
+    <button class="global-sidebar-toggle" onclick="toggleGlobalSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 
     <!-- ==================== HERO SECTION ==================== -->
     <section class="section hero" id="home">
@@ -76,12 +84,12 @@
                     </div>
                     <h1 class="hero-title">
                         <span class="line">أداة فحص</span>
-                        <span class="line"><span class="gradient-text">نقاط ضعف</span></span>
-                        <span class="line">مواقع الويب</span>
+                        <span class="line"><span class="gradient-text">نقاط الضعف الأمنية</span></span>
+                        <span class="line">لمواقع الويب</span>
                     </h1>
                     <p class="hero-desc">
-                        أداة احترافية لفحص نقاط ضعف مواقع الويب بشكل آمن وقانوني.
-                        مصممة لطلاب الأمن السيبراني والمختبرات التعليمية والشركات الصغيرة.
+                        أداة متقدمة لفحص نقاط الضعف الأمنية لمواقع الويب عبر 25 خطوة فحص منظمة.
+                        تكتشف 18+ نقطة ضعف مع نظام تسجيل أمني ذكي — مصممة للتعلم والاستخدام الأخلاقي.
                     </p>
                     <div class="hero-buttons">
                         <a href="#download" class="btn btn-primary">
@@ -93,20 +101,20 @@
                     </div>
                     <div class="hero-stats">
                         <div class="stat-item">
-                            <div class="stat-number" id="scanCount">10+</div>
-                            <div class="stat-label">نوع فحص</div>
+                            <div class="stat-number" id="scanCount">25</div>
+                            <div class="stat-label">خطوة فحص</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number">3</div>
+                            <div class="stat-number" id="vulnCount">18+</div>
+                            <div class="stat-label">نقطة ضعف</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">5</div>
                             <div class="stat-label">صيغ تقارير</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number">100%</div>
-                            <div class="stat-label">مفتوح المصدر</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">CLI</div>
-                            <div class="stat-label">واجهة تفاعلية</div>
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">أوضاع فحص</div>
                         </div>
                     </div>
                 </div>
@@ -121,19 +129,23 @@
                         <span class="terminal-title">CyberDev — Terminal</span>
                     </div>
                     <div class="terminal-body" id="terminalBody">
-                        <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">python cyberdev.py</span> <span class="t-flag">--target</span> <span class="t-url">https://example.com</span></div>
+                        <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">python main.py</span> <span class="t-flag">scan</span> <span class="t-url">https://example.com</span></div>
                         <div class="terminal-line"><br></div>
-                        <div class="terminal-line"><span class="t-info">  ██████╗██╗   ██╗██████╗ ███████╗██████╗</span></div>
-                        <div class="terminal-line"><span class="t-info"> ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗</span></div>
-                        <div class="terminal-line"><span class="t-info"> ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝</span></div>
-                        <div class="terminal-line"><span class="t-info"> ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗</span></div>
-                        <div class="terminal-line"><span class="t-info"> ╚██████╗   ██║   ██████╔╝███████╗██║  ██║</span></div>
-                        <div class="terminal-line"><span class="t-info">  ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝</span></div>
+<pre class="ascii-logo">
+  ____      _               ____
+ / ___|   _| |__   ___ _ __ |  _ \  _____   __
+| |  | | | | '_ \ / _ \ '__|| | | |/ _ \ \ / /
+| |__| |_| | |_) |  __/ |   | |_| |  __/\ V /
+ \____\__, |_.__/ \___|_|   |____/ \___| \_/
+      |___/
+</pre>
                         <div class="terminal-line"><br></div>
-                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Starting scan on</span> <span class="t-url">https://example.com</span></div>
-                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Checking Security Headers...</span> <span class="t-warn">⚠ Missing X-Frame-Options</span></div>
-                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Checking Email Security...</span> <span class="t-success">✔ SPF record found</span></div>
-                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Scan completed! Report saved to</span> <span class="t-url">reports/scan_2025.json</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Phase 1: Reconnaissance...</span> <span class="t-success">✔ Whois, DNS, Ports, GeoIP</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Phase 2: Content Analysis...</span> <span class="t-warn">⚠ Missing CSP Header</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Phase 3: Web Intelligence...</span> <span class="t-success">✔ CMS: WordPress 6.4</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Phase 4: Vulnerability Testing...</span> <span class="t-warn">⚠ SQL Injection found</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Phase 5: Scoring...</span> <span class="t-success">Grade: B (78/100)</span></div>
+                        <div class="terminal-line"><span class="t-success">[✓]</span> <span class="t-dim">Scan completed! Session:</span> <span class="t-url">SWVC-20260212-example.com</span></div>
                     </div>
                 </div>
             </div>
@@ -150,13 +162,14 @@
                         ما هي أداة <span class="highlight">CyberDev</span>؟
                     </h2>
                     <p class="section-desc">
-                        CyberDev هي أداة فحص أمني مفتوحة المصدر مكتوبة بلغة Python،
-                        تهدف إلى مساعدة المختصين والطلاب في فحص مواقع الويب واكتشاف
-                        نقاط الضعف بطريقة آمنة وقانونية — دون أي استغلال.
+                        CyberDev هي أداة فحص أمني متقدمة مفتوحة المصدر مكتوبة بلغة Python،
+                        تقوم بفحص مواقع الويب عبر <strong>25 خطوة</strong> فحص منظمة تشمل
+                        الاستطلاع، تحليل المحتوى، اكتشاف التقنيات، واختبار <strong>18+ نقطة ضعف</strong> أمنية.
                     </p>
                     <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 2; margin-bottom: 24px;">
-                        تتميز الأداة بواجهة CLI تفاعلية سهلة الاستخدام، وإمكانية تصدير التقارير
-                        بعدة صيغ، بالإضافة إلى نظام جلسات لحفظ نتائج الفحوصات السابقة.
+                        تتميز الأداة بنظام تسجيل أمني ذكي (Security Scoring) يعطي درجات من A إلى F،
+                        مع تقارير احترافية بخمس صيغ (JSON, HTML, Markdown, CSV, CLI)،
+                        وربط تلقائي مع تصنيفات OWASP Top 10 وCWE.
                     </p>
                 </div>
                 <div class="about-features reveal stagger-children">
@@ -199,6 +212,39 @@
                     تساعدك على تحديد المشاكل الأمنية المحتملة دون محاولة استغلالها أو إلحاق أي ضرر.
                 </p>
             </div>
+
+            <!-- Pipeline Section -->
+            <div class="reveal" style="text-align: center; margin-top: 60px;">
+                <h3 style="font-size: 1.5rem; margin-bottom: 12px;">كيف يعمل الفحص؟ <span style="color: var(--accent-cyan);">25 خطوة</span></h3>
+                <p style="color: var(--text-secondary); margin-bottom: 40px;">خط أنابيب فحص منظم من 5 مراحل رئيسية</p>
+            </div>
+            <div class="contribute-steps reveal stagger-children" style="margin-bottom: 0;">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>الاستطلاع</h4>
+                    <p>Whois، DNS، فحص البورتات، GeoIP، SSL، CDN/WAF، نطاقات فرعية</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>تحليل المحتوى</h4>
+                    <p>Headers، CORS، Cookies، Secrets، Data Leakage، robots.txt</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>الذكاء التقني</h4>
+                    <p>CMS، JS Frameworks، API Keys، Forms، Crawling، Fuzzing</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>فحص نقاط الضعف</h4>
+                    <p>18+ نقطة ضعف: SQLi، XSS، RCE، SSRF، JWT، والمزيد</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <h4>التسجيل والتقرير</h4>
+                    <p>Security Score (A-F)، OWASP Mapping، تقارير متعددة</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -209,54 +255,205 @@
                 <span class="section-badge"><i class="fas fa-star"></i> المميزات</span>
                 <h2 class="section-title">مميزات <span class="highlight">قوية</span> لفحص شامل</h2>
                 <p class="section-desc" style="margin: 0 auto 40px;">
-                    تقدم CyberDev مجموعة متنوعة من الفحوصات الأمنية مع واجهة تفاعلية سهلة الاستخدام.
+                    18+ نقطة ضعف مع فحص استطلاعي شامل ونظام تسجيل أمني ذكي.
                 </p>
             </div>
 
             <div class="features-tabs reveal">
-                <button class="tab-btn active" onclick="showTab('scans')">أنواع الفحوصات</button>
-                <button class="tab-btn" onclick="showTab('cli')">واجهة CLI</button>
+                <button class="tab-btn active" onclick="showTab('vulns')">18+ نقطة ضعف</button>
+                <button class="tab-btn" onclick="showTab('recon')">الاستطلاع</button>
+                <button class="tab-btn" onclick="showTab('scoring')">التسجيل الأمني</button>
                 <button class="tab-btn" onclick="showTab('reports-feat')">التقارير</button>
-                <button class="tab-btn" onclick="showTab('sessions')">الجلسات</button>
+                <button class="tab-btn" onclick="showTab('profiles')">أوضاع الفحص</button>
             </div>
 
-            <!-- Scans Tab -->
-            <div class="tab-content" id="tab-scans">
+            <!-- Vulnerabilities Tab -->
+            <div class="tab-content" id="tab-vulns">
                 <div class="scan-types-grid reveal stagger-children">
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
-                            <i class="fas fa-exclamation-triangle"></i>
+                            <i class="fas fa-database"></i>
                         </div>
                         <div>
-                            <h4>Misconfigurations</h4>
-                            <p>اكتشاف الإعدادات الخاطئة في السيرفر والتطبيق التي قد تؤدي لثغرات أمنية.</p>
+                            <h4>SQL Injection</h4>
+                            <p>حقن قواعد البيانات: Error-based, Time-based, Boolean-based.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div>
+                            <h4>Cross-Site Scripting (XSS)</h4>
+                            <p>هجمات JavaScript: Reflected و Stored XSS.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div>
+                            <h4>Remote Code Execution (RCE)</h4>
+                            <p>تنفيذ أوامر عن بعد على الخادم.</p>
                         </div>
                     </div>
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
-                            <i class="fas fa-box-open"></i>
+                            <i class="fas fa-file-alt"></i>
                         </div>
                         <div>
-                            <h4>Outdated Software</h4>
-                            <p>الكشف عن البرمجيات والمكتبات القديمة التي تحتوي على ثغرات معروفة.</p>
+                            <h4>Local File Inclusion (LFI)</h4>
+                            <p>قراءة ملفات النظام من خلال نقاط ضعف التضمين.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <h4>SSRF</h4>
+                            <p>تزوير طلبات الخادم (Server-Side Request Forgery).</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div>
+                            <h4>Template Injection (SSTI)</h4>
+                            <p>حقن قوالب الخادم Server-Side Template Injection.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div>
+                            <h4>XML External Entity (XXE)</h4>
+                            <p>هجمات XML لقراءة الملفات وتنفيذ طلبات.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div>
+                            <h4>JWT Security</h4>
+                            <p>فحص JSON Web Tokens واكتشاف نقاط الضعف.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h4>GraphQL Security</h4>
+                            <p>فحص أمان GraphQL APIs واكتشاف Introspection.</p>
                         </div>
                     </div>
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
-                            <i class="fas fa-heading"></i>
+                            <i class="fas fa-external-link-alt"></i>
                         </div>
                         <div>
-                            <h4>Security Headers</h4>
-                            <p>التحقق من وجود وتكوين هيدرز الأمان مثل CSP و X-Frame-Options وغيرها.</p>
+                            <h4>Open Redirect</h4>
+                            <p>إعادة توجيه غير آمنة لاستغلال الثقة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <h4>Host Header Injection</h4>
+                            <p>حقن رأس المضيف لتقنيات Password Reset Poisoning.</p>
                         </div>
                     </div>
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
-                            <i class="fas fa-envelope-open-text"></i>
+                            <i class="fas fa-memory"></i>
                         </div>
                         <div>
-                            <h4>Email Security (SPF/DMARC)</h4>
-                            <p>فحص سجلات DNS للتحقق من حماية البريد الإلكتروني ضد الانتحال.</p>
+                            <h4>Cache Poisoning</h4>
+                            <p>تسميم الذاكرة المؤقتة لخداع المستخدمين.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
+                            <i class="fas fa-user-lock"></i>
+                        </div>
+                        <div>
+                            <h4>Authentication Flaws</h4>
+                            <p>نقاط ضعف المصادقة وإدارة الجلسات.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div>
+                            <h4>File Upload Security</h4>
+                            <p>أمان رفع الملفات واكتشاف نقاط الضعف.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div>
+                            <h4>API Security</h4>
+                            <p>BOLA, Mass Assignment وفحص أمان الـ APIs.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div>
+                            <h4>WebSocket Security</h4>
+                            <p>فحص أمان اتصالات WebSocket.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 191, 0, 0.1); color: #ffc107;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h4>Insecure Deserialization</h4>
+                            <p>فك تسلسل غير آمن لتنفيذ أكواد خبيثة.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 191, 0, 0.1); color: #ffc107;">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div>
+                            <h4>Rate Limiting</h4>
+                            <p>فحص حدود معدل الطلبات وحماية Brute Force.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recon Tab -->
+            <div class="tab-content" id="tab-recon" style="display: none;">
+                <div class="scan-types-grid reveal stagger-children">
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h4>Whois & DNS</h4>
+                            <p>جمع معلومات Whois وتحليل DNS وفحص SPF/DMARC.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div>
+                            <h4>فحص البورتات</h4>
+                            <p>فحص 100+ بورت شائع مع تصنيف مخاطر البورتات الخطيرة.</p>
                         </div>
                     </div>
                     <div class="scan-card">
@@ -265,16 +462,34 @@
                         </div>
                         <div>
                             <h4>SSL/TLS Analysis</h4>
-                            <p>تحليل شهادات SSL وبروتوكولات التشفير المستخدمة.</p>
+                            <p>تحليل شهادات SSL وبروتوكولات التشفير وتاريخ الانتهاء.</p>
                         </div>
                     </div>
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
-                            <i class="fas fa-server"></i>
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <div>
-                            <h4>Server Information</h4>
-                            <p>جمع معلومات السيرفر مثل نوعه وإصداره والتقنيات المستخدمة.</p>
+                            <h4>GeoIP & Hosting</h4>
+                            <p>تحديد الموقع الجغرافي ومزود الاستضافة والـ CDN/WAF.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
+                            <i class="fas fa-heading"></i>
+                        </div>
+                        <div>
+                            <h4>Security Headers</h4>
+                            <p>فحص CSP, HSTS, X-Frame-Options, X-Content-Type-Options.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(255, 159, 67, 0.1); color: var(--accent-orange);">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div>
+                            <h4>CORS Analysis</h4>
+                            <p>فحص سلبي ونشط لاكتشاف أخطاء CORS الخطيرة.</p>
                         </div>
                     </div>
                     <div class="scan-card">
@@ -282,48 +497,57 @@
                             <i class="fas fa-cookie-bite"></i>
                         </div>
                         <div>
-                            <h4>Cookie Security</h4>
-                            <p>فحص إعدادات الكوكيز والتحقق من خصائص الأمان مثل HttpOnly و Secure.</p>
+                            <h4>Cookie Analysis</h4>
+                            <p>فحص Secure, HttpOnly, SameSite وخصائص الأمان.</p>
                         </div>
                     </div>
                     <div class="scan-card">
                         <div class="scan-icon" style="background: rgba(255, 71, 87, 0.1); color: var(--accent-red);">
-                            <i class="fas fa-robot"></i>
+                            <i class="fas fa-eye"></i>
                         </div>
                         <div>
-                            <h4>Robots.txt Analysis</h4>
-                            <p>تحليل ملف robots.txt للكشف عن مسارات حساسة قد تكون مكشوفة.</p>
+                            <h4>Content & Data Leakage</h4>
+                            <p>اكتشاف الأسرار وتسريب البيانات في المحتوى.</p>
                         </div>
                     </div>
                     <div class="scan-card">
-                        <div class="scan-icon" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);">
-                            <i class="fas fa-network-wired"></i>
+                        <div class="scan-icon" style="background: rgba(0, 255, 136, 0.1); color: var(--accent-green);">
+                            <i class="fas fa-cogs"></i>
                         </div>
                         <div>
-                            <h4>Port Scanning</h4>
-                            <p>فحص المنافذ المفتوحة الشائعة على الخادم المستهدف.</p>
+                            <h4>Web Tech Intelligence</h4>
+                            <p>CMS, JS Frameworks, API Keys, Forms, نطاقات فرعية.</p>
+                        </div>
+                    </div>
+                    <div class="scan-card">
+                        <div class="scan-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-spider"></i>
+                        </div>
+                        <div>
+                            <h4>Crawling & Fuzzing</h4>
+                            <p>زحف تلقائي للموقع وDirectory Fuzzing للملفات الحساسة.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- CLI Tab -->
-            <div class="tab-content" id="tab-cli" style="display: none;">
+            <!-- Scoring Tab -->
+            <div class="tab-content" id="tab-scoring" style="display: none;">
                 <div class="cards-grid reveal">
                     <div class="card">
-                        <div class="card-icon cyan"><i class="fas fa-terminal"></i></div>
-                        <h3>واجهة تفاعلية كاملة</h3>
-                        <p>واجهة CLI تفاعلية مع قوائم ملونة وتنظيم واضح للخيارات باستخدام Rich و InquirerPy.</p>
+                        <div class="card-icon cyan"><i class="fas fa-chart-line"></i></div>
+                        <h3>تسجيل أمني ذكي</h3>
+                        <p>درجة أمنية من 0 إلى 100 مع درجات A-F. خصم مرجح حسب خطورة نقطة الضعف: CRITICAL=20, HIGH=10, MEDIUM=5.</p>
                     </div>
                     <div class="card">
-                        <div class="card-icon green"><i class="fas fa-palette"></i></div>
-                        <h3>ألوان ورموز واضحة</h3>
-                        <p>نتائج ملونة بألوان مميزة لتسهيل التمييز بين النتائج الإيجابية والتحذيرات والأخطاء.</p>
+                        <div class="card-icon green"><i class="fas fa-th-list"></i></div>
+                        <h3>تحليل 10 أقسام</h3>
+                        <p>Transport, Headers, Content, Cookie, CORS, Network, Authentication, Injection, Application, API Security.</p>
                     </div>
                     <div class="card">
-                        <div class="card-icon purple"><i class="fas fa-sliders-h"></i></div>
-                        <h3>خيارات مرنة</h3>
-                        <p>إمكانية تخصيص الفحص واختيار أنواع محددة مع دعم الأوامر المتقدمة.</p>
+                        <div class="card-icon purple"><i class="fas fa-file-signature"></i></div>
+                        <h3>ملخص تنفيذي</h3>
+                        <p>تقييم الوضع الأمني مع توصيات عملية وربط تلقائي مع CWE وOWASP Top 10.</p>
                     </div>
                 </div>
             </div>
@@ -332,40 +556,50 @@
             <div class="tab-content" id="tab-reports-feat" style="display: none;">
                 <div class="cards-grid reveal">
                     <div class="card">
+                        <div class="card-icon cyan"><i class="fas fa-terminal"></i></div>
+                        <h3>عرض CLI ملون</h3>
+                        <p>عرض تفاعلي ملون على الشاشة مع شريط تقدم ورموز حسب الخطورة.</p>
+                    </div>
+                    <div class="card">
                         <div class="card-icon orange"><i class="fas fa-file-code"></i></div>
                         <h3>تصدير JSON</h3>
-                        <p>تقارير بصيغة JSON مناسبة للمعالجة البرمجية والدمج مع أدوات أخرى.</p>
+                        <p>تقارير JSON كاملة للمعالجة البرمجية والتكامل مع أدوات أخرى.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon blue"><i class="fas fa-file-alt"></i></div>
                         <h3>تصدير HTML</h3>
-                        <p>تقارير HTML جميلة وتفاعلية يمكن مشاركتها مع الفريق أو العميل.</p>
+                        <p>تقارير HTML احترافية مع لوحة معلومات ورسوم بيانية.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon purple"><i class="fas fa-file-word"></i></div>
+                        <h3>تصدير Markdown</h3>
+                        <p>تقارير Markdown للتوثيق مع جداول منظمة وملخصات.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon green"><i class="fas fa-file-csv"></i></div>
                         <h3>تصدير CSV</h3>
-                        <p>تقارير CSV لتحليل البيانات في Excel أو أي أداة تحليل بيانات.</p>
+                        <p>تقارير CSV لتحليل البيانات في Excel مع معلومات كاملة.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Sessions Tab -->
-            <div class="tab-content" id="tab-sessions" style="display: none;">
+            <!-- Profiles Tab -->
+            <div class="tab-content" id="tab-profiles" style="display: none;">
                 <div class="cards-grid reveal">
                     <div class="card">
-                        <div class="card-icon cyan"><i class="fas fa-history"></i></div>
-                        <h3>حفظ الجلسات</h3>
-                        <p>حفظ نتائج كل فحص تلقائيًا لمراجعتها لاحقًا ومقارنتها بالفحوصات السابقة.</p>
+                        <div class="card-icon green"><i class="fas fa-bolt"></i></div>
+                        <h3>Quick Scan (سريع)</h3>
+                        <p>استطلاع سلبي فقط — فحص Headers وCookies وDNS والمحتوى دون اختبار نقاط ضعف نشط.</p>
                     </div>
                     <div class="card">
-                        <div class="card-icon purple"><i class="fas fa-search"></i></div>
-                        <h3>استعراض النتائج</h3>
-                        <p>إمكانية استعراض جميع الفحوصات السابقة مع تفاصيل كل فحص.</p>
+                        <div class="card-icon cyan"><i class="fas fa-search"></i></div>
+                        <h3>Full Scan (كامل)</h3>
+                        <p>استطلاع + اختبار نقاط ضعف نشط — الوضع الافتراضي لفحص شامل ومتوازن.</p>
                     </div>
                     <div class="card">
-                        <div class="card-icon green"><i class="fas fa-chart-line"></i></div>
-                        <h3>تتبع التغييرات</h3>
-                        <p>مقارنة النتائج عبر الزمن لمعرفة ما إذا تم إصلاح الثغرات.</p>
+                        <div class="card-icon purple"><i class="fas fa-microscope"></i></div>
+                        <h3>Deep Audit (عميق)</h3>
+                        <p>فحص شامل مع جميع الاختبارات مفعلة — عمق أكبر وتغطية قصوى.</p>
                     </div>
                 </div>
             </div>
@@ -404,17 +638,17 @@
                             تأكد من توفر Python 3.8+ على جهازك قبل البدء.
                         </p>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
-<span class="t-dim"># استنساخ المشروع</span>
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+<span class="t-dim"># Clone the project</span>
 <span class="t-prompt">$</span> git clone https://github.com/ahmedalhomili/CyberDev.git
 <span class="t-prompt">$</span> cd CyberDev
 
-<span class="t-dim"># إنشاء بيئة افتراضية (اختياري لكن مُوصى)</span>
-<span class="t-prompt">$</span> python -m venv venv
-<span class="t-prompt">$</span> source venv/bin/activate  <span class="t-dim"># Linux/Mac</span>
-<span class="t-prompt">$</span> venv\Scripts\activate     <span class="t-dim"># Windows</span>
+<span class="t-dim"># Create virtual environment (optional but recommended)</span>
+<span class="t-prompt">$</span> python -m venv .venv
+<span class="t-prompt">$</span> source .venv/bin/activate  <span class="t-dim"># Linux/Mac</span>
+<span class="t-prompt">$</span> .venv\Scripts\activate     <span class="t-dim"># Windows</span>
 
-<span class="t-dim"># تثبيت المتطلبات</span>
+<span class="t-dim"># Install dependencies</span>
 <span class="t-prompt">$</span> pip install -r requirements.txt
                         </div>
                         <h4 style="margin-top: 20px; margin-bottom: 12px;">المتطلبات:</h4>
@@ -432,15 +666,18 @@
                             ابدأ أول فحص لك في أقل من دقيقة:
                         </p>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
-<span class="t-dim"># تشغيل الأداة</span>
-<span class="t-prompt">$</span> python cyberdev.py
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+<span class="t-dim"># Interactive mode (recommended)</span>
+<span class="t-prompt">$</span> python main.py
 
-<span class="t-dim"># أو مع تحديد الهدف مباشرة</span>
-<span class="t-prompt">$</span> python cyberdev.py --target https://example.com
+<span class="t-dim"># Direct CLI scan</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com
 
-<span class="t-dim"># فحص محدد</span>
-<span class="t-prompt">$</span> python cyberdev.py --target https://example.com --scan headers
+<span class="t-dim"># Scan with verbose output</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com -v
+
+<span class="t-dim"># Quick scan (recon only)</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --profile passive
                         </div>
                     </div>
 
@@ -448,18 +685,24 @@
                     <div class="doc-block reveal" id="doc-commands">
                         <h3><i class="fas fa-terminal"></i> أوامر CLI</h3>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
-<span class="t-dim"># عرض المساعدة</span>
-<span class="t-prompt">$</span> python cyberdev.py --help
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+<span class="t-dim"># Main commands:</span>
+  scan URL          <span class="t-dim">Scan a website</span>
+  history           <span class="t-dim">View previous scans</span>
+  show SESSION_ID   <span class="t-dim">View scan details</span>
+  help              <span class="t-dim">Quick help with examples</span>
+  man               <span class="t-dim">Full manual (Linux man style)</span>
 
-<span class="t-dim"># الأوامر المتاحة:</span>
-  --target, -t    <span class="t-dim">تحديد الموقع المستهدف</span>
-  --scan, -s      <span class="t-dim">نوع الفحص (headers, email, ssl, all)</span>
-  --output, -o    <span class="t-dim">مسار حفظ التقرير</span>
-  --format, -f    <span class="t-dim">صيغة التقرير (json, html, csv)</span>
-  --session       <span class="t-dim">استعراض الجلسات السابقة</span>
-  --verbose, -v   <span class="t-dim">عرض تفاصيل إضافية</span>
-  --version       <span class="t-dim">عرض رقم الإصدار</span>
+<span class="t-dim"># Scan command options:</span>
+  -v, --verbose           <span class="t-dim">Show scan details</span>
+  -p, --profile PROFILE   <span class="t-dim">Scan mode: passive|standard|extended</span>
+  -j, --json FILE         <span class="t-dim">Export JSON</span>
+  -m, --markdown FILE     <span class="t-dim">Export Markdown</span>
+  --html FILE             <span class="t-dim">Export HTML</span>
+  --csv FILE              <span class="t-dim">Export CSV</span>
+
+<span class="t-dim"># History command options:</span>
+  --limit N               <span class="t-dim">Show last N scans (default: 10)</span>
                         </div>
                     </div>
 
@@ -470,29 +713,38 @@
                             يمكنك تخصيص إعدادات الأداة عبر ملف <code style="color: var(--accent-cyan);">config.py</code>:
                         </p>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
 <span class="t-dim"># config.py</span>
-<span class="t-flag">TIMEOUT</span> = <span class="t-url">30</span>          <span class="t-dim"># مهلة الاتصال بالثواني</span>
-<span class="t-flag">USER_AGENT</span> = <span class="t-url">"CyberDev/1.0"</span>
-<span class="t-flag">MAX_RETRIES</span> = <span class="t-url">3</span>       <span class="t-dim"># عدد المحاولات</span>
-<span class="t-flag">REPORT_DIR</span> = <span class="t-url">"reports/"</span> <span class="t-dim"># مجلد التقارير</span>
-<span class="t-flag">SESSION_DIR</span> = <span class="t-url">"sessions/"</span>
+<span class="t-flag">REQUEST_TIMEOUT</span> = <span class="t-url">10</span>         <span class="t-dim"># Connection timeout (seconds)</span>
+<span class="t-flag">MAX_RETRIES</span> = <span class="t-url">3</span>              <span class="t-dim"># Retry attempts</span>
+<span class="t-flag">CRAWLER_MAX_DEPTH</span> = <span class="t-url">2</span>        <span class="t-dim"># Crawl depth</span>
+<span class="t-flag">CRAWLER_MAX_URLS</span> = <span class="t-url">30</span>        <span class="t-dim"># Max URLs to crawl</span>
+<span class="t-flag">PORT_SCAN_TIMEOUT</span> = <span class="t-url">0.8</span>      <span class="t-dim"># Port scan timeout</span>
+<span class="t-flag">PORT_SCAN_THREADS</span> = <span class="t-url">30</span>       <span class="t-dim"># Parallel threads</span>
+
+<span class="t-dim"># Scan profiles:</span>
+<span class="t-flag">passive</span>   → <span class="t-url">Quick Scan</span>    <span class="t-dim"># Recon only</span>
+<span class="t-flag">standard</span>  → <span class="t-url">Full Scan</span>     <span class="t-dim"># Full scan (default)</span>
+<span class="t-flag">extended</span>  → <span class="t-url">Deep Audit</span>    <span class="t-dim"># Deep comprehensive scan</span>
                         </div>
                     </div>
 
                     <!-- Sessions -->
                     <div class="doc-block reveal" id="doc-sessions">
                         <h3><i class="fas fa-history"></i> إدارة الجلسات</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                            يتم حفظ جميع الفحوصات تلقائياً في <code style="color: var(--accent-cyan);">sessions/scan_sessions/</code>
+                        </p>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
-<span class="t-dim"># عرض جميع الجلسات المحفوظة</span>
-<span class="t-prompt">$</span> python cyberdev.py --session list
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+<span class="t-dim"># Show last 10 scans</span>
+<span class="t-prompt">$</span> python main.py history
 
-<span class="t-dim"># عرض تفاصيل جلسة محددة</span>
-<span class="t-prompt">$</span> python cyberdev.py --session view --id 1
+<span class="t-dim"># Show last 5 scans</span>
+<span class="t-prompt">$</span> python main.py history --limit 5
 
-<span class="t-dim"># حذف جلسة</span>
-<span class="t-prompt">$</span> python cyberdev.py --session delete --id 1
+<span class="t-dim"># Show specific scan details</span>
+<span class="t-prompt">$</span> python main.py show SWVC-20260212-example.com-abc123
                         </div>
                     </div>
 
@@ -500,18 +752,21 @@
                     <div class="doc-block reveal" id="doc-export">
                         <h3><i class="fas fa-file-export"></i> تصدير التقارير</h3>
                         <div class="code-block">
-                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
-<span class="t-dim"># تصدير بصيغة JSON</span>
-<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f json
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+<span class="t-dim"># Export as JSON</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --json report.json
 
-<span class="t-dim"># تصدير بصيغة HTML</span>
-<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f html
+<span class="t-dim"># Export as HTML</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --html report.html
 
-<span class="t-dim"># تصدير بصيغة CSV</span>
-<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f csv
+<span class="t-dim"># Export as Markdown</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --markdown report.md
 
-<span class="t-dim"># تحديد مسار مخصص</span>
-<span class="t-prompt">$</span> python cyberdev.py -t https://example.com -f json -o ~/my-reports/
+<span class="t-dim"># Export as CSV</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --csv report.csv
+
+<span class="t-dim"># Export all formats at once</span>
+<span class="t-prompt">$</span> python main.py scan https://example.com --json r.json --html r.html --markdown r.md --csv r.csv
                         </div>
                     </div>
                 </div>
@@ -538,7 +793,7 @@
                     <h3>Git Clone</h3>
                     <p>الطريقة الأفضل — استنساخ المشروع مباشرة مع إمكانية التحديث بسهولة.</p>
                     <div class="code-block" style="text-align: left; direction: ltr; margin: 16px 0;">
-                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
                         git clone https://github.com/ahmedalhomili/CyberDev.git
                     </div>
                     <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
@@ -575,7 +830,7 @@
                     تحقق من تطابق الهاش بعد التحميل:
                 </p>
                 <div class="code-block" style="margin: 0;">
-                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> نسخ</button>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
 <span class="t-dim"># Linux / Mac</span>
 sha256sum CyberDev-main.zip
 
@@ -599,11 +854,12 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
 
             <div class="report-demo reveal">
                 <div class="report-header">
-                    <h4><i class="fas fa-file-alt" style="color: var(--accent-cyan);"></i> مثال على تقرير فحص</h4>
+                    <h4><i class="fas fa-file-alt" style="color: var(--accent-cyan);"></i> مثال على تقرير فحص — Grade: B (78/100)</h4>
                     <div class="report-formats">
                         <span class="format-badge json">JSON</span>
                         <span class="format-badge html">HTML</span>
                         <span class="format-badge csv">CSV</span>
+                        <span class="format-badge html">Markdown</span>
                     </div>
                 </div>
                 <div class="report-body">
@@ -660,6 +916,24 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                                     <td><span class="severity medium">متوسط</span></td>
                                     <td><span class="status-dot vuln"></span> ضعيف</td>
                                 </tr>
+                                <tr>
+                                    <td><i class="fas fa-database" style="color: var(--accent-red); margin-left: 8px;"></i> SQL Injection</td>
+                                    <td>Error-based SQLi في /search?q=</td>
+                                    <td><span class="severity critical">حرج</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-code" style="color: var(--accent-red); margin-left: 8px;"></i> XSS</td>
+                                    <td>Reflected XSS في /comment?text=</td>
+                                    <td><span class="severity high">عالي</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-exchange-alt" style="color: var(--accent-orange); margin-left: 8px;"></i> CORS</td>
+                                    <td>Origin reflection — يعكس أي Origin</td>
+                                    <td><span class="severity high">عالي</span></td>
+                                    <td><span class="status-dot vuln"></span> ضعيف</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -683,48 +957,30 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                 <div class="timeline-item">
                     <div class="timeline-dot latest"></div>
                     <div class="timeline-card">
-                        <span class="version-tag"><i class="fas fa-tag"></i> v1.2.0</span>
-                        <div class="timeline-date">📅 يناير 2025</div>
-                        <ul class="change-list">
-                            <li><span class="change-type new">جديد</span> إضافة فحص Cookie Security</li>
-                            <li><span class="change-type new">جديد</span> دعم تصدير تقارير CSV</li>
-                            <li><span class="change-type improve">تحسين</span> تحسين سرعة الفحوصات بنسبة 40%</li>
-                            <li><span class="change-type fix">إصلاح</span> إصلاح مشكلة في فحص SSL للنطاقات الفرعية</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-card">
-                        <span class="version-tag"><i class="fas fa-tag"></i> v1.1.0</span>
-                        <div class="timeline-date">📅 ديسمبر 2024</div>
-                        <ul class="change-list">
-                            <li><span class="change-type new">جديد</span> إضافة نظام الجلسات</li>
-                            <li><span class="change-type new">جديد</span> دعم تقارير HTML</li>
-                            <li><span class="change-type improve">تحسين</span> تحسين واجهة CLI التفاعلية</li>
-                            <li><span class="change-type fix">إصلاح</span> إصلاح خطأ في فحص Email Security</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-card">
                         <span class="version-tag"><i class="fas fa-tag"></i> v1.0.0</span>
-                        <div class="timeline-date">📅 نوفمبر 2024</div>
+                        <div class="timeline-date">📅 فبراير 2026 — الإصدار الأول</div>
                         <ul class="change-list">
                             <li><span class="change-type new">جديد</span> الإصدار الأول من CyberDev</li>
-                            <li><span class="change-type new">جديد</span> فحص Security Headers</li>
-                            <li><span class="change-type new">جديد</span> فحص Email Security (SPF/DMARC)</li>
-                            <li><span class="change-type new">جديد</span> فحص SSL/TLS</li>
-                            <li><span class="change-type new">جديد</span> تصدير تقارير JSON</li>
+                            <li><span class="change-type new">جديد</span> 18+ فاحص نقاط ضعف (SQLi, XSS, RCE, LFI, SSRF...)</li>
+                            <li><span class="change-type new">جديد</span> استطلاع متعدد (Whois, DNS, Ports, GeoIP, SSL)</li>
+                            <li><span class="change-type new">جديد</span> Web Technology Analyzer — اكتشاف CMS و JS Frameworks و API Keys</li>
+                            <li><span class="change-type new">جديد</span> Cookie Analyzer — فحص خصائص أمان الكوكيز</li>
+                            <li><span class="change-type new">جديد</span> Data Leakage Scanner — اكتشاف تسريب البيانات</li>
+                            <li><span class="change-type new">جديد</span> Security Scoring Engine — درجة أمنية (0-100) مع تصنيف A-F</li>
+                            <li><span class="change-type new">جديد</span> OWASP Mapping — ربط تلقائي CWE مع OWASP Top 10</li>
+                            <li><span class="change-type new">جديد</span> واجهة CLI تفاعلية + وضع سطر أوامر</li>
+                            <li><span class="change-type new">جديد</span> أوامر help و man — أدلة مساعدة مع أمثلة</li>
+                            <li><span class="change-type new">جديد</span> تصدير تقارير JSON, HTML, Markdown, CSV</li>
+                            <li><span class="change-type new">جديد</span> نظام جلسات تلقائي لحفظ الفحوصات</li>
+                            <li><span class="change-type new">جديد</span> 25 خطوة فحص منظمة عبر 5 مراحل</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    
 
     <!-- ==================== LEGAL ==================== -->
     <section class="section" id="legal">
@@ -777,7 +1033,7 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                         </li>
                         <li>
                             <i class="fas fa-times" style="color: var(--accent-red);"></i>
-                            محاولة استغلال الثغرات المكتشفة
+                            محاولة استغلال نقاط الضعف المكتشفة
                         </li>
                         <li>
                             <i class="fas fa-times" style="color: var(--accent-red);"></i>
@@ -884,10 +1140,10 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
     <section class="section" id="community">
         <div class="container">
             <div class="reveal" style="text-align: center;">
-                <span class="section-badge"><i class="fas fa-users"></i> المجتمع</span>
-                <h2 class="section-title">مجتمع <span class="highlight">CyberDev</span></h2>
+                <span class="section-badge"><i class="fas fa-users"></i> الفريق</span>
+                <h2 class="section-title">فريق <span class="highlight">CyberDev</span></h2>
                 <p class="section-desc" style="margin: 0 auto 50px;">
-                    انضم إلى مجتمع المطورين والباحثين الأمنيين وساهم في تطوير الأداة.
+                    تعرّف على فريق التطوير وراء الأداة.
                 </p>
             </div>
 
@@ -900,13 +1156,33 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                     <span class="role">المؤسس والمطور الرئيسي</span>
                     <div class="links">
                         <a href="https://github.com/ahmedalhomili" target="_blank"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
 
                 <div class="contributor-card">
                     <div class="contributor-avatar" style="background: var(--gradient-purple);">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h4>بازل عادل</h4>
+                    <span class="role">Security Headers</span>
+                    <div class="links">
+                        <a href="https://github.com/othmancoc" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="contributor-card">
+                    <div class="contributor-avatar" style="background: var(--gradient-danger);">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h4>محمد الاصبحي</h4>
+                    <span class="role">CORS & Reporting</span>
+                    <div class="links">
+                        <a href="https://github.com/wazeercs" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="contributor-card">
+                    <div class="contributor-avatar" style="background: linear-gradient(135deg, #3b82f6, #00f0ff);">
                         <i class="fas fa-user-plus"></i>
                     </div>
                     <h4>أنت!</h4>
@@ -916,20 +1192,6 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">
                         ساهم في المشروع وانضم لقائمة المساهمين!
-                    </p>
-                </div>
-
-                <div class="contributor-card">
-                    <div class="contributor-avatar" style="background: var(--gradient-danger);">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h4>المجتمع العربي</h4>
-                    <span class="role">مجتمع الأمن السيبراني</span>
-                    <div class="links">
-                        <a href="https://github.com/ahmedalhomili/CyberDev/discussions" target="_blank"><i class="fas fa-comments"></i></a>
-                    </div>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px;">
-                        انضم للنقاشات وشارك خبراتك
                     </p>
                 </div>
             </div>
@@ -978,7 +1240,7 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
                     </div>
                     <span>CyberDev</span>
                 </div>
-                <p>أداة فحص نقاط ضعف مواقع الويب بشكل آمن واحترافي. مفتوحة المصدر ومصممة للتعلم والاستخدام الأخلاقي.</p>
+                <p>أداة فحص نقاط ضعف أمنية متقدمة بـ 25 خطوة فحص و 18+ نقطة ضعف. مفتوحة المصدر ومصممة للتعلم والاستخدام الأخلاقي.</p>
                 <div class="footer-social">
                     <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank"><i class="fab fa-github"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
@@ -1008,10 +1270,10 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
             </div>
 
             <div class="footer-col">
-                <h4>المجتمع</h4>
+                <h4>الفريق</h4>
                 <ul>
                     <li><a href="#contact">تواصل</a></li>
-                    <li><a href="#community">المساهمون</a></li>
+                    <li><a href="#community">الفريق</a></li>
                     <li><a href="https://github.com/ahmedalhomili/CyberDev/issues" target="_blank">Issues</a></li>
                     <li><a href="https://github.com/ahmedalhomili/CyberDev/discussions" target="_blank">نقاشات</a></li>
                 </ul>
@@ -1019,7 +1281,7 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
         </div>
 
         <div class="footer-bottom">
-            <p>© 2025 CyberDev — جميع الحقوق محفوظة. صُنع بـ ❤️ بواسطة <a href="https://github.com/ahmedalhomili" target="_blank">Ahmed Alhomili</a></p>
+            <p>© 2026 CyberDev v1.0 — جميع الحقوق محفوظة. صُنع بـ ❤️ بواسطة <a href="https://github.com/ahmedalhomili/CyberDev" target="_blank">فريق CyberDev</a></p>
             <p>
                 <a href="#legal" style="margin-left: 16px;">إخلاء المسؤولية</a>
                 <a href="https://github.com/ahmedalhomili/CyberDev/blob/main/LICENSE" target="_blank">الرخصة</a>
@@ -1033,12 +1295,60 @@ Get-FileHash CyberDev-main.zip -Algorithm SHA256
     </button>
 
     <!-- Toast -->
-    <div class="toast" id="toast">
+    <div class="toast" id="toast" style="display:none;">
         <i class="fas fa-check-circle"></i>
-        <span id="toastMsg">تم النسخ بنجاح!</span>
+        <span id="toastMsg"></span>
+    </div>
+
+    <!-- ==================== POPUP MODAL ==================== -->
+    <div class="modal-overlay hidden" id="noticeModal">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeNoticeModal()" aria-label="إغلاق">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-content">
+                <div class="modal-icon">⚡</div>
+                <h2>بُنيت من الصفر بدون اعتماد على أدوات خارجية</h2>
+                <p class="modal-desc">
+                    <strong>CyberDev</strong> تم تطويرها بالكامل من البداية باستخدام Python النقي،
+                    دون الاعتماد على أي أدوات فحص أمني جاهزة أو مكتبات خارجية للفحص.
+                    كل وحدة فحص، كل سطر كود، وكل خوارزمية كُتبت يدوياً لضمان:
+                </p>
+                <div class="modal-features">
+                    <div class="modal-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span><strong>التحكم الكامل</strong><br>كود مفهوم وقابل للتعديل</span>
+                    </div>
+                    <div class="modal-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span><strong>الوضوح</strong><br>كود مفتوح بالكامل</span>
+                    </div>
+                    <div class="modal-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span><strong>الأداء</strong><br>سرعة عالية وموارد منخفضة</span>
+                    </div>
+                    <div class="modal-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span><strong>الأمان</strong><br>خالية من ثغرات</span>
+                    </div>
+                </div>
+                <div class="modal-tech">
+                    <strong>التقنيات المستخدمة:</strong>
+                    <code>Python 3.11+</code>
+                    <code>Requests</code>
+                    <code>BeautifulSoup4</code>
+                    <code>Socket</code>
+                    <code>SSL/TLS</code>
+                    <code>JSON/CSV</code>
+                </div>
+                <button class="modal-btn" onclick="closeNoticeModal()">
+                    <i class="fas fa-check"></i> فهمت، لنبدأ!
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- ==================== JAVASCRIPT ==================== -->
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=7.5"></script>
 </body>
 </html>

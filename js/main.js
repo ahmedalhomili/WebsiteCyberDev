@@ -1,7 +1,48 @@
+// ====== POPUP MODAL ======
+// Show modal on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('noticeModal');
+    if (modal) {
+        // Check if user has seen the modal before (using sessionStorage for current session only)
+        const hasSeenModal = sessionStorage.getItem('cyberdev_modal_seen');
+        if (!hasSeenModal) {
+            setTimeout(() => {
+                modal.classList.remove('hidden');
+            }, 800); // Show after 800ms delay
+        }
+    }
+});
+
+// Close modal function
+function closeNoticeModal() {
+    const modal = document.getElementById('noticeModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        // Save to sessionStorage so it doesn't show again in this session
+        sessionStorage.setItem('cyberdev_modal_seen', 'true');
+    }
+}
+
+// Close modal when clicking on overlay (outside modal content)
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('noticeModal');
+    if (modal && e.target === modal) {
+        closeNoticeModal();
+    }
+});
+
+// Close modal with ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeNoticeModal();
+    }
+});
+
 // ====== NAVBAR SCROLL EFFECT ======
 const navbar = document.getElementById('navbar');
 const scrollTop = document.getElementById('scrollTop');
 const navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
+const sidebarLinks = document.querySelectorAll('.sidebar-link');
 const sections = document.querySelectorAll('.section');
 
 window.addEventListener('scroll', () => {
@@ -19,7 +60,7 @@ window.addEventListener('scroll', () => {
         scrollTop.classList.remove('visible');
     }
 
-    // Active nav link
+    // Active nav link & sidebar link
     let current = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop - 100;
@@ -27,7 +68,17 @@ window.addEventListener('scroll', () => {
             current = section.getAttribute('id');
         }
     });
+    
+    // Update navbar links
     navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Update sidebar links
+    sidebarLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href') === '#' + current) {
             link.classList.add('active');
@@ -37,6 +88,22 @@ window.addEventListener('scroll', () => {
 
 scrollTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ====== GLOBAL SIDEBAR ======
+function toggleGlobalSidebar() {
+    const sidebar = document.getElementById('globalSidebar');
+    sidebar.classList.toggle('active');
+}
+
+// Close sidebar when clicking on a link (mobile only)
+sidebarLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+            const sidebar = document.getElementById('globalSidebar');
+            sidebar.classList.remove('active');
+        }
+    });
 });
 
 // ====== MOBILE MENU ======
@@ -78,39 +145,88 @@ function showTab(tabName) {
     event.target.classList.add('active');
 }
 
+// ====== WIKI TABS ======
+function showWikiTab(tabName) {
+    document.querySelectorAll('.wiki-tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    document.querySelectorAll('.wiki-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    const targetTab = document.getElementById('wiki-tab-' + tabName);
+    if (targetTab) {
+        targetTab.style.display = 'grid';
+    }
+
+    event.target.closest('.wiki-tab-btn').classList.add('active');
+    
+    // Update sidebar visibility
+    document.querySelectorAll('.wiki-sidebar-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    const sidebarSection = document.getElementById('sidebar-' + tabName);
+    if (sidebarSection) {
+        sidebarSection.style.display = 'block';
+    }
+}
+
 // ====== COPY CODE ======
 function copyCode(btn) {
     const codeBlock = btn.parentElement;
     const text = codeBlock.textContent
-        .replace('نسخ', '')
+        .replace('Copy', '')
+        .replace('Done!', '')
         .trim();
 
-    navigator.clipboard.writeText(text).then(() => {
+    function onSuccess() {
         showToast('تم نسخ الكود بنجاح! 📋');
-        btn.innerHTML = '<i class="fas fa-check"></i> تم!';
+        btn.innerHTML = '<i class="fas fa-check"></i> Done!';
         setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+            btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
         }, 2000);
-    }).catch(() => {
-        // Fallback
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+            fallbackCopy(text) && onSuccess();
+        });
+    } else {
+        fallbackCopy(text) && onSuccess();
+    }
+}
+
+function fallbackCopy(text) {
+    try {
         const textarea = document.createElement('textarea');
         textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
         document.body.appendChild(textarea);
         textarea.select();
-        document.execCommand('copy');
+        const success = document.execCommand('copy');
         document.body.removeChild(textarea);
-        showToast('تم نسخ الكود بنجاح! 📋');
-    });
+        return success;
+    } catch (e) {
+        return false;
+    }
 }
 
 // ====== TOAST ======
 function showToast(msg) {
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
+    if (!toast || !toastMsg) return;
     toastMsg.textContent = msg;
+    toast.style.display = 'flex';
+    toast.classList.remove('show');
+    void toast.offsetHeight;
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 400);
     }, 3000);
 }
 
@@ -156,7 +272,7 @@ const scanCountEl = document.getElementById('scanCount');
 const counterObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            animateCounter(scanCountEl, 10, 1500);
+            animateCounter(scanCountEl, 25, 1500);
             counterObserver.unobserve(entry.target);
         }
     });
